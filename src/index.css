@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap');
+@import "tailwindcss";
+
+:root {
+  /* Light Theme */
+  --color-bg-primary: #F7F7F8;
+  --color-bg-secondary: #ffffff;
+  --color-card-bg: #ffffff;
+  --color-border-subtle: rgba(0, 0, 0, 0.1);
+  --color-border-hover: rgba(0, 0, 0, 0.2);
+  --color-text-primary: #000000;
+  --color-text-muted: rgba(0, 0, 0, 0.65);
+  --color-accent: #F8BE0C;
+  --color-accent-fg: #000000;
+  --color-accent-dim: rgba(248, 190, 12, 0.15);
+  --color-accent-hover: #e0ab0b;
+}
+
+.dark {
+  /* Dark Theme */
+  --color-bg-primary: #000000;
+  --color-bg-secondary: #121212;
+  --color-card-bg: #121212;
+  --color-border-subtle: rgba(255, 255, 255, 0.1);
+  --color-border-hover: rgba(255, 255, 255, 0.2);
+  --color-text-primary: #FFFFFF;
+  --color-text-muted: rgba(255, 255, 255, 0.65);
+  --color-accent: #F8BE0C;
+  --color-accent-fg: #000000;
+  --color-accent-dim: rgba(248, 190, 12, 0.15);
+  --color-accent-hover: #e0ab0b;
+}
+
+@theme {
+  --color-bg-primary: var(--color-bg-primary);
+  --color-bg-secondary: var(--color-bg-secondary);
+  --color-card-bg: var(--color-card-bg);
+  --color-border-subtle: var(--color-border-subtle);
+  --color-border-hover: var(--color-border-hover);
+  --color-text-primary: var(--color-text-primary);
+  --color-text-muted: var(--color-text-muted);
+  --color-accent: var(--color-accent);
+  --color-accent-fg: var(--color-accent-fg);
+  --color-accent-dim: var(--color-accent-dim);
+  --color-accent-hover: var(--color-accent-hover);
+
+  --font-display: "Bebas Neue", sans-serif;
+  --font-body: "DM Sans", sans-serif;
+
+  --animate-marquee: marquee 20s linear infinite;
+  --animate-scroll: scroll 2s ease-in-out infinite;
+
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  @keyframes scroll {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(200%); }
+  }
+}
+
+body {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-accent);
+}
