@@ -12,6 +12,10 @@ import { Work } from './pages/Work';
 import { Services } from './pages/Services';
 import { Contact } from './pages/Contact';
 import { NotFound } from './pages/NotFound';
+import { AdminLayout } from './components/admin/AdminLayout';
+import { AdminDashboard } from './pages/admin/AdminDashboard';
+import { AdminLeads } from './pages/admin/AdminLeads';
+import { AdminSettings } from './pages/admin/AdminSettings';
 
 export default function App() {
   return (
@@ -24,6 +28,11 @@ export default function App() {
           <Route path="services" element={<Services />} />
           <Route path="contact" element={<Contact />} />
           <Route path="*" element={<NotFound />} />
+        </Route>
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="leads" element={<AdminLeads />} />
+          <Route path="settings" element={<AdminSettings />} />
         </Route>
       </Routes>
     </Router>
