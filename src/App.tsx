@@ -9,6 +9,7 @@ import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
 import { About } from './pages/About';
 import { Work } from './pages/Work';
+import { CaseStudy } from './pages/CaseStudy';
 import { Services } from './pages/Services';
 import { Contact } from './pages/Contact';
 import { NotFound } from './pages/NotFound';
@@ -21,18 +22,19 @@ export default function App() {
   return (
     <Router>
       <Routes>
+        <Route path="admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="leads" element={<AdminLeads />} />
+          <Route path="settings" element={<AdminSettings />} />
+        </Route>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="about" element={<About />} />
           <Route path="work" element={<Work />} />
+          <Route path="work/:projectId" element={<CaseStudy />} />
           <Route path="services" element={<Services />} />
           <Route path="contact" element={<Contact />} />
           <Route path="*" element={<NotFound />} />
-        </Route>
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<AdminDashboard />} />
-          <Route path="leads" element={<AdminLeads />} />
-          <Route path="settings" element={<AdminSettings />} />
         </Route>
       </Routes>
     </Router>

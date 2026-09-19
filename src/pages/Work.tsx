@@ -1,40 +1,19 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { SectionLabel } from '../components/ui/SectionLabel';
 import { Card } from '../components/ui/Card';
 import { Reveal } from '../components/ui/Reveal';
-import { ArrowRight, ChevronDown } from 'lucide-react';
+import { ArrowRight, ChevronDown, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-const projects = [
-  { id: 'dotsugar', name: 'Dot Sugar PDX', category: 'Social Media', logo: 'https://www.creatvemindsmedia.com/wp-content/uploads/2025/12/Dot-Sugar-Logo-1.png', prob: 'No visual consistency or brand presence online', sol: ['Social Media', 'Design'], result: '↑ 2.4M Views & 240% Engagement' },
-  { id: 'sheesh', name: 'SHEESH Shawarma', category: 'Web', logo: 'https://www.creatvemindsmedia.com/wp-content/uploads/2025/12/SHEESH-LOGO-03-1024x408.png', prob: 'No engagement despite regular posting', sol: ['Social Media', 'Design', 'Web'], result: '0 → 12.5K Followers in 3 Months' },
-  { id: 'classicshawarma', name: 'Classic Shawarma', category: 'Branding', logo: 'https://www.creatvemindsmedia.com/wp-content/uploads/2025/12/ClassicShawarmaLogo-05-1024x1024.png', prob: 'No digital presence at launch', sol: ['Social Media', 'Design', 'Web'], result: '↑ 150% Foot Traffic & 500K Reach' },
-  { id: 'mrpotato', name: 'Mr Potato', category: 'Design', logo: 'https://www.creatvemindsmedia.com/wp-content/uploads/2025/06/Mr-Potato-Logo-04-300x300.png', prob: 'No digital presence at launch', sol: ['Branding', 'Social Media', 'Web'], result: '↑ 500% Brand Awareness & 1M+ Impressions' },
-  { id: 'macadeli', name: 'Mac-A-Deli', category: 'Branding', logo: 'https://www.creatvemindsmedia.com/wp-content/uploads/2025/12/Wing-A-Deli-Logo-03-300x57.png', prob: 'No digital presence at launch', sol: ['Branding', 'Social Media', 'Web'], result: 'Sold Out Opening Week & 10K+ Local Reach' },
-  { id: 'chickenshit', name: 'Chicken\'s Hit', category: 'Social Media', logo: 'https://www.creatvemindsmedia.com/wp-content/uploads/2025/12/Chickens-Hit-4-300x300.png', prob: 'Needed bold impact online', sol: ['Social Media', 'Content Creation'], result: '↑ 300% Online Orders & 50K Monthly Views' },
-  { id: 'shawarmaspot', name: 'Shawarma Spot', category: 'Branding', logo: 'https://www.creatvemindsmedia.com/wp-content/uploads/2025/12/Shawarma-Spot-Logo-300x300.png', prob: 'Needed a strong identity to stand out', sol: ['Branding', 'Design'], result: 'Your Spot, Their Craving' },
-  { id: 'bakeontherun', name: 'Bake on the Run', category: 'Branding', logo: 'https://www.creatvemindsmedia.com/wp-content/uploads/2025/12/BakeontheRunlogocopy2-300x62.png', prob: 'Lacked a cohesive street-savvy look', sol: ['Branding', 'Design'], result: 'Island Flavor. Street Savvy.' },
-  { id: 'sealand', name: 'Sealand Fish & Chips', category: 'Design', logo: 'https://www.creatvemindsmedia.com/wp-content/uploads/2025/06/Sealand-Fish-Chips-Logo-300x300.png', prob: 'Outdated visual identity', sol: ['Design', 'Branding'], result: 'Hooked on Identity. Anchored in Design.' },
-  { id: 'shawarmahazard', name: 'Shawarma Hazard', category: 'Social Media', logo: 'https://www.creatvemindsmedia.com/wp-content/uploads/2025/12/Hazard-Logo-Final-01-300x163.png', prob: 'Low digital engagement', sol: ['Social Media', 'Content Creation'], result: 'Dangerously Good. Digitally Delivered.' },
-  { id: 'turfandivy', name: 'Turf and Ivy', category: 'Web', logo: 'https://www.creatvemindsmedia.com/wp-content/uploads/2025/12/Turf-and-Ivy-Website-Logo-01-1024x519.png', prob: 'Needed an elevated online presence', sol: ['Web', 'Design'], result: 'Earthy Meets Elevated' },
-  { id: 'mrgyro', name: 'Mr Gyro', category: 'Design', logo: 'https://www.creatvemindsmedia.com/wp-content/uploads/2025/12/Mr-Gyro-Logo-300x300.png', prob: 'Needed fresh design for their flavor', sol: ['Design', 'Branding'], result: 'Flavor with a Side of Fresh Design' },
-  { id: 'sophiascafe', name: 'SOPHIA\'S CAFE', category: 'Design', logo: 'https://www.creatvemindsmedia.com/wp-content/uploads/2025/12/SOPHIAS-CAFE-New-Logo-300x77.png', prob: 'Menu and styling needed an upgrade', sol: ['Design', 'Branding'], result: 'Comfort, Styled & Served' },
-  { id: 'mikescheesesteak', name: 'Mike\'s Cheesesteak', category: 'Branding', logo: 'https://www.creatvemindsmedia.com/wp-content/uploads/2025/06/Mikes-Cheesesteak-Logo-01-300x300.png', prob: 'Needed a brand built to drip', sol: ['Branding', 'Design'], result: 'Built to Drip' },
-  { id: 'namobuddha', name: 'Namo Buddha', category: 'Branding', logo: 'https://www.creatvemindsmedia.com/wp-content/uploads/2025/12/Namo-Buddha-Logo-300x300.png', prob: 'Required a refreshed look', sol: ['Branding', 'Design'], result: 'A Taste of the Himalayas, Refreshed.' },
-  { id: 'shawarmagrill', name: 'Shawarma Grill Halal', category: 'Social Media', logo: 'https://www.creatvemindsmedia.com/wp-content/uploads/2025/12/Shawarma-Grill-Halal-Logo-10-1-300x300.png', prob: 'Needed digital sizzle to match the grill', sol: ['Social Media', 'Design'], result: 'Grill Heat. Digital Sizzle.' },
-  { id: 'fosterfoodcarts', name: 'Foster Food Carts', category: 'Web', logo: 'https://www.creatvemindsmedia.com/wp-content/uploads/2025/12/Foster-Food-Carts-Logo-300x300.png', prob: 'Needed a community hub online', sol: ['Web', 'Social Media'], result: 'Serving Flavor. Supporting Community.' },
-  { id: 'hawthorne', name: 'Hawthorne Street Food and Bar', category: 'Branding', logo: 'https://www.creatvemindsmedia.com/wp-content/uploads/2025/12/Hawthorne-Logo-300x300.png', prob: 'Needed a block-ready identity', sol: ['Branding', 'Design'], result: 'Built for the Block.' },
-  { id: 'shawarmacenter', name: 'Shawarma Center', category: 'Design', logo: 'https://www.creatvemindsmedia.com/wp-content/uploads/2025/12/Shawarma-Center-Logo-BASIC-01-300x300.png', prob: 'Food truck needed a visual overhaul', sol: ['Design', 'Branding'], result: 'Flavor That Shows Up Daily.' },
-  { id: 'futureminds', name: 'The Future Minds', category: 'Social Media', logo: 'https://www.creatvemindsmedia.com/wp-content/uploads/2025/12/TFM-Logo-Final-300x74.png', prob: 'Needed to shape stories for the future', sol: ['Social Media', 'Content Creation'], result: 'Stories That Shape the Future.' },
-  { id: 'carolecharbel', name: 'Carole & Charbel', category: 'Web', logo: 'https://www.creatvemindsmedia.com/wp-content/uploads/2025/12/Carole-Charbel-Isolated-300x300.png', prob: 'Needed a platform for life\'s moments', sol: ['Web', 'Design'], result: 'Life, Love, and the Moments Between.' },
-];
+import { projects, type Project } from '../data/projects';
 
 const filters = ['All', 'Social Media', 'Branding', 'Web', 'Design'];
 
 export function Work() {
   const [activeFilter, setActiveFilter] = useState('All');
   const [showAll, setShowAll] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   const filteredProjects = activeFilter === 'All' 
     ? projects 
@@ -162,8 +141,8 @@ export function Work() {
                               <p className="text-xs text-[var(--color-text-muted)] uppercase tracking-wider mb-1">Result:</p>
                               <p className="font-display text-2xl text-[var(--color-accent)] tracking-wide">{project.result}</p>
                             </div>
-                            <Button href={`#${project.id}`} variant="outline" className="!px-4 !py-2 !text-[11px]">
-                              View Case Study <ArrowRight className="ml-2 w-3 h-3" />
+                            <Button onClick={() => setSelectedProject(project)} variant="outline" className="!px-4 !py-2 !text-[11px]">
+                              Quick View <ArrowRight className="ml-2 w-3 h-3" />
                             </Button>
                           </div>
                         </div>
@@ -188,6 +167,23 @@ export function Work() {
           )}
         </div>
       </section>
+
+      <AnimatePresence>
+        {selectedProject && (
+          <motion.div className="fixed inset-0 z-[70] flex items-end bg-black/70 p-0 sm:items-center sm:justify-center sm:p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSelectedProject(null)}>
+            <motion.section role="dialog" aria-modal="true" aria-labelledby="quick-view-title" className="relative max-h-[90vh] w-full overflow-y-auto bg-[var(--color-bg-primary)] sm:max-w-2xl" initial={{ y: 36, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 36, opacity: 0 }} onClick={(event) => event.stopPropagation()}>
+              <button onClick={() => setSelectedProject(null)} className="absolute right-5 top-5 z-10 rounded-full border border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] p-2 hover:text-[var(--color-accent)]" aria-label="Close quick view"><X size={20} /></button>
+              <div className="border-b border-[var(--color-border-subtle)] p-8 sm:p-10">
+                <div className="mb-8 flex h-28 items-center justify-center bg-[var(--color-card-bg)] p-6"><img src={selectedProject.logo} alt={selectedProject.name} className="max-h-full max-w-full object-contain" referrerPolicy="no-referrer" /></div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-accent)]">Quick Project View · {selectedProject.category}</p>
+                <h2 id="quick-view-title" className="mt-3 font-display text-5xl tracking-wide sm:text-6xl">{selectedProject.name}</h2>
+              </div>
+              <div className="grid gap-8 p-8 sm:grid-cols-2 sm:p-10"><div><p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">The challenge</p><p className="mt-3 text-lg leading-relaxed">{selectedProject.prob}</p></div><div><p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">Result</p><p className="mt-3 font-display text-3xl tracking-wide text-[var(--color-accent)]">{selectedProject.result}</p></div><div className="sm:col-span-2"><p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">Solutions delivered</p><div className="mt-3 flex flex-wrap gap-2">{selectedProject.sol.map((service) => <span key={service} className="border border-[var(--color-border-subtle)] px-3 py-2 text-xs font-semibold uppercase tracking-wider">{service}</span>)}</div></div></div>
+              <div className="flex flex-col gap-3 border-t border-[var(--color-border-subtle)] p-6 sm:flex-row sm:justify-end"><Button onClick={() => setSelectedProject(null)} variant="outline">Close</Button><Button href={`/work/${selectedProject.id}`}>View Full Case Study <ArrowRight className="ml-2 h-4 w-4" /></Button></div>
+            </motion.section>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* PROCESS STRIP */}
       <section className="bg-[var(--color-accent)] py-8 overflow-hidden">

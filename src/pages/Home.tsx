@@ -205,7 +205,7 @@ export function Home() {
               { name: 'Mr Potato', logo: 'https://www.creatvemindsmedia.com/wp-content/uploads/2025/06/Mr-Potato-Logo-01-1024x1024.png', prob: 'No digital presence at launch', sol: 'Branding, Social Media, Web', link: 'mrpotato', result: '50K+', resultLabel: 'Local Reach' },
             ].map((client, i) => (
               <Reveal key={client.name} delay={0.1 * (i % 3 + 1)}>
-                <a href={`/work#${client.link}`} className="block h-full">
+                <a href={`#/work/${client.link}`} className="block h-full">
                   <Card className="h-full flex flex-col group overflow-hidden p-0">
                     <div className="h-48 flex items-center justify-center p-8 bg-white border-b border-[var(--color-border-subtle)] relative overflow-hidden">
                       <div className="absolute inset-0 bg-gradient-to-tr from-[var(--color-bg-primary)] to-transparent opacity-50"></div>
