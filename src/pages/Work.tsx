@@ -45,7 +45,7 @@ export function Work() {
   return (
     <div className="w-full">
       {/* PAGE HERO */}
-      <section className="relative min-h-[60vh] flex items-center pt-20 overflow-hidden bg-[var(--color-bg-primary)]">
+      <section className="relative min-h-[60vh] flex items-center pt-24 pb-20 md:pt-28 md:pb-24 overflow-hidden bg-[var(--color-bg-primary)]">
         <div className="absolute top-[30%] right-[30%] w-[600px] h-[600px] bg-[var(--color-accent)] rounded-full blur-[150px] opacity-10 pointer-events-none translate-x-1/2 -translate-y-1/2"></div>
         <div className="absolute inset-0 pointer-events-none opacity-[0.035] mix-blend-overlay z-10">
           <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">

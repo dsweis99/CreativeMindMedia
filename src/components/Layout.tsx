@@ -64,7 +64,7 @@ export function Layout() {
   return (
     <div className="min-h-screen flex flex-col">
       <header
-        className={`absolute top-0 left-0 right-0 z-50 transition-all duration-300 bg-[var(--color-bg-primary)] border-b border-[var(--color-border-subtle)] flex items-center h-24`}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-[var(--color-bg-primary)] border-b border-[var(--color-border-subtle)] flex items-center h-24 ${scrolled ? 'shadow-lg' : ''}`}
       >
         <div className="w-full max-w-7xl mx-auto px-6 md:px-8 lg:px-[60px] flex items-center justify-between">
           <Link to="/" className="flex items-center">
@@ -177,7 +177,7 @@ export function Layout() {
         <div className="max-w-7xl mx-auto px-6 md:px-8 lg:px-[60px]">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
             <div>
-              <Logo className="h-8 mb-6" />
+              <Logo className="h-10 gap-4 mb-7" labelClassName="text-xl md:text-2xl" />
               <p className="text-[var(--color-text-muted)] text-sm mb-6">
                 Serving Portland businesses and growing brands nationwide.
               </p>

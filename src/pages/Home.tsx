@@ -9,7 +9,7 @@ export function Home() {
   return (
     <div className="w-full">
       {/* HERO SECTION */}
-      <section className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden">
+      <section className="relative min-h-[90vh] flex items-center pt-24 pb-28 md:pt-28 md:pb-32 overflow-hidden">
         {/* Background Glow */}
         <div className="fixed top-[30%] right-[30%] w-[600px] h-[600px] bg-[var(--color-accent)] rounded-full blur-[150px] opacity-10 pointer-events-none translate-x-1/2 -translate-y-1/2 z-0"></div>
         
@@ -46,7 +46,7 @@ export function Home() {
               </p>
             </Reveal>
 
-            <Reveal delay={0.4} className="flex flex-col sm:flex-row gap-4">
+            <Reveal delay={0.4} className="flex flex-col sm:flex-row gap-4 mb-16 md:mb-20">
               <Button href="/work" variant="primary">Explore Our Work <ArrowRight className="ml-2 w-4 h-4" /></Button>
               <Button href="/services" variant="outline">Our Services</Button>
             </Reveal>
@@ -162,11 +162,11 @@ export function Home() {
                     <Icon size={160} strokeWidth={1} />
                   </div>
                   <div className="relative z-10 flex flex-col h-full">
-                    <div className="flex justify-between items-start mb-8">
-                      <span className="font-display text-4xl text-[var(--color-text-muted)] group-hover:text-[var(--color-text-primary)] transition-colors">{service.num}</span>
+                    <div className="flex items-start gap-4 mb-8">
                       <div className="w-12 h-12 rounded-full bg-[var(--color-bg-secondary)] border border-[var(--color-border-subtle)] flex items-center justify-center group-hover:border-[var(--color-accent)] group-hover:bg-[var(--color-accent)] group-hover:text-[var(--color-accent-fg)] transition-all duration-300">
                         <Icon size={20} />
                       </div>
+                      <span className="font-display text-4xl text-[var(--color-text-muted)] group-hover:text-[var(--color-text-primary)] transition-colors">{service.num}</span>
                     </div>
                     <h3 className="font-display text-3xl tracking-wide mb-4">{service.title}</h3>
                     <p className="text-[var(--color-text-muted)] text-sm leading-relaxed flex-grow">{service.desc}</p>
