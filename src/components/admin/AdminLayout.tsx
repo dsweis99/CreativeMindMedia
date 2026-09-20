@@ -13,13 +13,14 @@ const navigation = [
 
 export function AdminLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const menu = (
     <nav className="space-y-2">
       {navigation.map(({ label, to, icon: Icon, end }) => (
-        <NavLink key={to} to={to} end={end} onClick={() => setMenuOpen(false)} className={({ isActive }) => `flex items-center gap-3 rounded-sm px-4 py-3 text-sm font-medium transition-colors ${isActive ? 'bg-[var(--color-accent)] text-[var(--color-accent-fg)]' : 'text-[var(--color-text-muted)] hover:bg-[var(--color-border-subtle)] hover:text-[var(--color-text-primary)]'}`}>
+        <NavLink key={to} to={to} end={end} onClick={() => setMenuOpen(false)} title={!sidebarOpen ? label : undefined} className={({ isActive }) => `flex items-center rounded-sm py-3 text-sm font-medium transition-colors ${sidebarOpen ? 'gap-3 px-4' : 'justify-center px-3'} ${isActive ? 'bg-[var(--color-accent)] text-[var(--color-accent-fg)]' : 'text-[var(--color-text-muted)] hover:bg-[var(--color-border-subtle)] hover:text-[var(--color-text-primary)]'}`}> 
           <Icon size={18} />
-          {label}
+          {sidebarOpen && <span>{label}</span>}
         </NavLink>
       ))}
     </nav>
@@ -27,16 +28,18 @@ export function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-[var(--color-bg-primary)] text-[var(--color-text-primary)]">
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 border-r border-[var(--color-border-subtle)] bg-[var(--color-bg-secondary)] p-6 lg:flex lg:flex-col">
-        <Link to="/" className="mb-12 inline-flex"><Logo className="h-9" /></Link>
+      <aside className={`fixed inset-y-0 left-0 z-40 hidden border-r border-[var(--color-border-subtle)] bg-[var(--color-bg-secondary)] p-6 transition-[width] duration-300 lg:flex lg:flex-col ${sidebarOpen ? 'w-72' : 'w-20'}`}>
+        <button type="button" onClick={() => setSidebarOpen((open) => !open)} className={`mb-12 inline-flex items-center rounded-sm text-left outline-none hover:opacity-80 focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] ${sidebarOpen ? '' : 'justify-center'}`} aria-label={sidebarOpen ? 'Collapse admin navigation' : 'Expand admin navigation'} title={sidebarOpen ? 'Collapse menu' : 'Expand menu'}>
+          <Logo className={sidebarOpen ? 'h-9' : 'h-8'} labelClassName={sidebarOpen ? '' : '!hidden'} />
+        </button>
         {menu}
-        <div className="mt-auto border-t border-[var(--color-border-subtle)] pt-6">
+        {sidebarOpen && <div className="mt-auto border-t border-[var(--color-border-subtle)] pt-6">
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--color-text-muted)]">Workspace</p>
           <p className="mt-2 text-sm font-medium">Creative Minds Media</p>
-        </div>
+        </div>}
       </aside>
 
-      <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] px-6 lg:ml-72 lg:px-10">
+      <header className={`sticky top-0 z-30 flex h-20 items-center justify-between border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] px-6 transition-[margin] duration-300 lg:px-10 ${sidebarOpen ? 'lg:ml-72' : 'lg:ml-20'}`}>
         <div className="flex items-center gap-4 lg:hidden">
           <button onClick={() => setMenuOpen(true)} className="rounded-sm p-2 hover:bg-[var(--color-border-subtle)]" aria-label="Open admin menu"><Menu size={22} /></button>
           <Logo className="h-7" />
@@ -61,7 +64,7 @@ export function AdminLayout() {
         </aside>
       </div>}
 
-      <main className="p-6 lg:ml-72 lg:p-10"><Outlet /></main>
+      <main className={`p-6 transition-[margin] duration-300 lg:p-10 ${sidebarOpen ? 'lg:ml-72' : 'lg:ml-20'}`}><Outlet /></main>
     </div>
   );
 }
