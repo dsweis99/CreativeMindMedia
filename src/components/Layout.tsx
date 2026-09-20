@@ -196,7 +196,7 @@ export function Layout() {
             </div>
             
             <div>
-              <h4 className="font-display text-xl tracking-wider mb-6">Quick Links</h4>
+              <h4 className="font-display text-xl tracking-wider mb-6 lg:mt-3">Quick Links</h4>
               <ul className="space-y-4">
                 <li><Link to="/" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors text-sm">Home</Link></li>
                 <li><Link to="/about" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors text-sm">About Us</Link></li>
@@ -206,7 +206,7 @@ export function Layout() {
             </div>
 
             <div>
-              <h4 className="font-display text-xl tracking-wider mb-6">Services</h4>
+              <h4 className="font-display text-xl tracking-wider mb-6 lg:mt-3">Services</h4>
               <ul className="space-y-4">
                 <li><Link to="/services" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors text-sm">Brand Strategy</Link></li>
                 <li><Link to="/services" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors text-sm">Content & Creative</Link></li>
@@ -215,7 +215,7 @@ export function Layout() {
             </div>
 
             <div>
-              <h4 className="font-display text-xl tracking-wider mb-6">Contact</h4>
+              <h4 className="font-display text-xl tracking-wider mb-6 lg:mt-3">Contact</h4>
               <ul className="space-y-4">
                 <li className="text-[var(--color-text-muted)] text-sm">Portland, OR 97220</li>
                 <li><a href="tel:19719986878" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors text-sm">1 (971) 998-6878</a></li>
