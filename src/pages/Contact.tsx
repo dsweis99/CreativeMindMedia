@@ -135,12 +135,12 @@ export function Contact() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label htmlFor="firstName" className="mb-2 block text-sm font-medium">First name <span className="text-[var(--color-accent)]">*</span></label>
-                  <input id="firstName" name="firstName" type="text" placeholder="e.g. Dima" required disabled={formState !== 'idle'} aria-describedby="firstNameHint" className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-subtle)] px-4 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] transition-all duration-300 disabled:opacity-50 placeholder:text-[var(--color-text-muted)]" />
+                  <input id="firstName" name="firstName" type="text" placeholder="e.g. Jane" required disabled={formState !== 'idle'} aria-describedby="firstNameHint" className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-subtle)] px-4 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] transition-all duration-300 disabled:opacity-50 placeholder:text-[var(--color-text-muted)]" />
                   <p id="firstNameHint" className="mt-2 text-xs text-[var(--color-text-muted)]">The name you'd like us to use.</p>
                 </div>
                 <div>
                   <label htmlFor="lastName" className="mb-2 block text-sm font-medium">Last name <span className="text-[var(--color-accent)]">*</span></label>
-                  <input id="lastName" name="lastName" type="text" placeholder="e.g. Al-Sweis" required disabled={formState !== 'idle'} aria-describedby="lastNameHint" className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-subtle)] px-4 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] transition-all duration-300 disabled:opacity-50 placeholder:text-[var(--color-text-muted)]" />
+                  <input id="lastName" name="lastName" type="text" placeholder="e.g. Doe" required disabled={formState !== 'idle'} aria-describedby="lastNameHint" className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-subtle)] px-4 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] transition-all duration-300 disabled:opacity-50 placeholder:text-[var(--color-text-muted)]" />
                   <p id="lastNameHint" className="mt-2 text-xs text-[var(--color-text-muted)]">Your family name.</p>
                 </div>
               </div>
