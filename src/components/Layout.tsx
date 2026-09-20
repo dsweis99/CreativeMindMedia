@@ -69,7 +69,7 @@ export function Layout() {
       >
         <div className="w-full max-w-7xl mx-auto px-6 md:px-8 lg:px-[60px] flex items-center justify-between">
           <Link to="/" className="flex items-center">
-            <Logo className="h-8 md:h-10" />
+            <Logo className="h-10 md:h-12" labelClassName="text-xl md:text-2xl" />
           </Link>
           
           <nav className="hidden md:flex items-center gap-8">
@@ -178,7 +178,7 @@ export function Layout() {
         <div className="max-w-7xl mx-auto px-6 md:px-8 lg:px-[60px]">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
             <div>
-              <Logo className="h-10 gap-4 mb-7" labelClassName="text-xl md:text-2xl" />
+              <Logo className="h-12 gap-5 mb-7" labelClassName="text-2xl md:text-3xl" />
               <p className="text-[var(--color-text-muted)] text-sm mb-6">
                 Serving Portland businesses and growing brands nationwide.
               </p>
