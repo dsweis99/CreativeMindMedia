@@ -129,31 +129,47 @@ export function Contact() {
             </div>
             
             <form className="space-y-8" onSubmit={handleSubmit}>
+              <p className="-mb-2 text-sm text-[var(--color-text-muted)]"><span className="text-[var(--color-accent)]">*</span> Required fields</p>
+
               {/* Basic Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <input type="text" placeholder="First Name" required disabled={formState !== 'idle'} className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-subtle)] px-4 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] transition-all duration-300 disabled:opacity-50 placeholder:text-[var(--color-text-muted)]" />
+                  <label htmlFor="firstName" className="mb-2 block text-sm font-medium">First name <span className="text-[var(--color-accent)]">*</span></label>
+                  <input id="firstName" name="firstName" type="text" placeholder="e.g. Dima" required disabled={formState !== 'idle'} aria-describedby="firstNameHint" className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-subtle)] px-4 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] transition-all duration-300 disabled:opacity-50 placeholder:text-[var(--color-text-muted)]" />
+                  <p id="firstNameHint" className="mt-2 text-xs text-[var(--color-text-muted)]">The name you'd like us to use.</p>
                 </div>
                 <div>
-                  <input type="text" placeholder="Last Name" required disabled={formState !== 'idle'} className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-subtle)] px-4 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] transition-all duration-300 disabled:opacity-50 placeholder:text-[var(--color-text-muted)]" />
+                  <label htmlFor="lastName" className="mb-2 block text-sm font-medium">Last name <span className="text-[var(--color-accent)]">*</span></label>
+                  <input id="lastName" name="lastName" type="text" placeholder="e.g. Al-Sweis" required disabled={formState !== 'idle'} aria-describedby="lastNameHint" className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-subtle)] px-4 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] transition-all duration-300 disabled:opacity-50 placeholder:text-[var(--color-text-muted)]" />
+                  <p id="lastNameHint" className="mt-2 text-xs text-[var(--color-text-muted)]">Your family name.</p>
                 </div>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <input type="email" placeholder="Email" required disabled={formState !== 'idle'} className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-subtle)] px-4 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] transition-all duration-300 disabled:opacity-50 placeholder:text-[var(--color-text-muted)]" />
+                  <label htmlFor="email" className="mb-2 block text-sm font-medium">Email address <span className="text-[var(--color-accent)]">*</span></label>
+                  <input id="email" name="email" type="email" placeholder="e.g. you@company.com" required disabled={formState !== 'idle'} aria-describedby="emailHint" className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-subtle)] px-4 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] transition-all duration-300 disabled:opacity-50 placeholder:text-[var(--color-text-muted)]" />
+                  <p id="emailHint" className="mt-2 text-xs text-[var(--color-text-muted)]">We'll send our reply here.</p>
                 </div>
                 <div>
-                  <input type="tel" placeholder="Contact Number" disabled={formState !== 'idle'} className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-subtle)] px-4 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] transition-all duration-300 disabled:opacity-50 placeholder:text-[var(--color-text-muted)]" />
+                  <label htmlFor="phone" className="mb-2 block text-sm font-medium">Phone number <span className="text-[var(--color-text-muted)]">(optional)</span></label>
+                  <input id="phone" name="phone" type="tel" placeholder="e.g. (971) 555-0123" disabled={formState !== 'idle'} aria-describedby="phoneHint" className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-subtle)] px-4 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] transition-all duration-300 disabled:opacity-50 placeholder:text-[var(--color-text-muted)]" />
+                  <p id="phoneHint" className="mt-2 text-xs text-[var(--color-text-muted)]">The best number to reach you.</p>
                 </div>
               </div>
 
               <div>
-                <textarea rows={6} placeholder="Textarea" disabled={formState !== 'idle'} className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-subtle)] px-4 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] transition-all duration-300 resize-none disabled:opacity-50 placeholder:text-[var(--color-text-muted)]"></textarea>
+                <label htmlFor="projectDetails" className="mb-2 block text-sm font-medium">Tell us about your project <span className="text-[var(--color-text-muted)]">(optional)</span></label>
+                <textarea id="projectDetails" name="projectDetails" rows={6} placeholder="For example: We need a new website for our restaurant and hope to launch before summer." disabled={formState !== 'idle'} aria-describedby="projectDetailsHint" className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-subtle)] px-4 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] focus:border-[var(--color-accent)] transition-all duration-300 resize-none disabled:opacity-50 placeholder:text-[var(--color-text-muted)]"></textarea>
+                <p id="projectDetailsHint" className="mt-2 text-xs text-[var(--color-text-muted)]">Share your business, goals, timing, or anything you'd like us to know.</p>
               </div>
 
               {/* Checkbox Categories */}
               <div className="pt-12 mt-12 border-t border-[var(--color-border-subtle)]">
+                <div className="mb-10">
+                  <h3 className="font-display text-3xl tracking-wide">What can we help with?</h3>
+                  <p className="mt-2 text-sm text-[var(--color-text-muted)]">Select any services you’re interested in.</p>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
                   {categories.map((category, idx) => (
                     <div key={category.title}>
