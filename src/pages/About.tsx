@@ -3,6 +3,7 @@ import { Button } from '../components/ui/Button';
 import { SectionLabel } from '../components/ui/SectionLabel';
 import { Card } from '../components/ui/Card';
 import { Reveal } from '../components/ui/Reveal';
+import { socialLinks } from '../data/socials';
 
 export function About() {
   return (
@@ -186,7 +187,7 @@ export function About() {
           <Reveal delay={0.4} className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button href="tel:19719986878" variant="primary">Call Us: (971) 998-6878</Button>
             <Button href="/contact" variant="outline">Send an Email</Button>
-            <Button href="https://www.instagram.com/thecreativemindsmedia/" variant="outline">DM on Instagram</Button>
+            <Button href={socialLinks.instagram} variant="outline">DM on Instagram</Button>
           </Reveal>
         </div>
       </section>

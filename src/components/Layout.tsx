@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from './ui/Button';
 import { Logo } from './ui/Logo';
 import { Instagram, Facebook, Linkedin, Sun, Moon, Menu, X, ArrowUp, ArrowDown } from 'lucide-react';
+import { socialLinks } from '../data/socials';
 
 export function Layout() {
   const [scrolled, setScrolled] = useState(false);
@@ -88,13 +89,13 @@ export function Layout() {
 
           <div className="hidden md:flex items-center gap-4">
             <div className="flex items-center gap-3 mr-2 pr-4 border-r border-[var(--color-border-subtle)]">
-              <a href="https://www.instagram.com/thecreativemindsmedia" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">
+              <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">
                 <Instagram size={18} />
               </a>
-              <a href="https://www.facebook.com/thecreativemindsmedia" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">
+              <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">
                 <Facebook size={18} />
               </a>
-              <a href="https://www.linkedin.com/company/thecreativemindsmedia/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">
+              <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">
                 <Linkedin size={18} />
               </a>
             </div>
@@ -154,13 +155,13 @@ export function Layout() {
             <div className="mt-12 pt-8 border-t border-[var(--color-border-subtle)] flex flex-col gap-6">
               <Button href="/contact" variant="primary" className="w-full justify-center">Start Project</Button>
               <div className="flex gap-4">
-                <a href="https://www.instagram.com/thecreativemindsmedia/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">
+                <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">
                   <Instagram size={24} />
                 </a>
-                <a href="https://www.facebook.com/@thecreatvemindsmedia" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">
+                <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">
                   <Facebook size={24} />
                 </a>
-                <a href="https://www.linkedin.com/company/creative-minds-media/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">
+                <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">
                   <Linkedin size={24} />
                 </a>
               </div>
@@ -182,13 +183,13 @@ export function Layout() {
                 Serving Portland businesses and growing brands nationwide.
               </p>
               <div className="flex gap-4">
-                <a href="https://www.instagram.com/thecreativemindsmedia/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">
+                <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">
                   <Instagram size={20} />
                 </a>
-                <a href="https://www.facebook.com/@thecreatvemindsmedia" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">
+                <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">
                   <Facebook size={20} />
                 </a>
-                <a href="https://www.linkedin.com/company/creative-minds-media/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">
+                <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">
                   <Linkedin size={20} />
                 </a>
               </div>

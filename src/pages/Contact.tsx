@@ -5,6 +5,7 @@ import { Card } from '../components/ui/Card';
 import { Reveal } from '../components/ui/Reveal';
 import { ChevronDown, CheckCircle2, Phone, MapPin, Instagram, Facebook, Linkedin } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { socialLinks } from '../data/socials';
 
 const faqs = [
   { q: 'How long does a typical project take?', a: 'Depends on scope. Social media setup: 1–2 weeks. Website: 3–6 weeks. Branding: 2–4 weeks.' },
@@ -107,11 +108,11 @@ export function Contact() {
                 </div>
                 <h3 className="font-display text-xl mb-2">Social</h3>
                 <div className="flex gap-4">
-                  <a href="https://www.instagram.com/thecreativemindsmedia/" target="_blank" rel="noopener noreferrer" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">Instagram</a>
+                  <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">Instagram</a>
                   <span className="text-[var(--color-border-subtle)]">|</span>
-                  <a href="https://www.facebook.com/@thecreatvemindsmedia" target="_blank" rel="noopener noreferrer" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">Facebook</a>
+                  <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">Facebook</a>
                   <span className="text-[var(--color-border-subtle)]">|</span>
-                  <a href="https://www.linkedin.com/company/creative-minds-media/" target="_blank" rel="noopener noreferrer" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">LinkedIn</a>
+                  <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors">LinkedIn</a>
                 </div>
               </div>
             </Reveal>
