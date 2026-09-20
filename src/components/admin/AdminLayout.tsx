@@ -27,7 +27,7 @@ export function AdminLayout() {
   );
 
   const adminTools = (
-    <div className="mt-5 border-t border-[var(--color-border-subtle)] pt-4">
+    <div className="mt-5 border-t border-[var(--color-border-subtle)] pt-4 lg:mt-auto">
       <button type="button" title={!sidebarOpen ? 'Notifications' : undefined} className={`relative flex min-h-12 items-center rounded-sm text-sm font-medium text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-border-subtle)] hover:text-[var(--color-text-primary)] ${sidebarOpen ? 'w-full gap-3 px-4' : 'h-12 w-12 justify-center'}`}>
         <Bell size={22} strokeWidth={2} /><span className="absolute right-3 top-3 h-2 w-2 rounded-full bg-[var(--color-accent)]" />
         {sidebarOpen && <span>Notifications</span>}
@@ -47,10 +47,6 @@ export function AdminLayout() {
         </button>
         {menu}
         {adminTools}
-        {sidebarOpen && <div className="mt-auto border-t border-[var(--color-border-subtle)] pt-6">
-          <p className="text-xs uppercase tracking-[0.16em] text-[var(--color-text-muted)]">Workspace</p>
-          <p className="mt-2 text-sm font-medium">Creative Minds Media</p>
-        </div>}
       </aside>
 
       <header className={`sticky top-0 z-30 flex h-20 items-center justify-between border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] px-6 transition-[margin] duration-300 lg:px-10 ${sidebarOpen ? 'lg:ml-72' : 'lg:ml-24'}`}>
