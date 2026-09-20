@@ -6,7 +6,7 @@ const storageKey = 'cmm-featured-offer';
 function readOffer(): FeaturedOffer {
   try {
     const stored = window.localStorage.getItem(storageKey);
-    return stored ? { ...defaultFeaturedOffer, ...JSON.parse(stored) } : defaultFeaturedOffer;
+    return stored ? { ...defaultFeaturedOffer, ...JSON.parse(stored), examples: JSON.parse(stored).examples ?? defaultFeaturedOffer.examples } : defaultFeaturedOffer;
   } catch {
     return defaultFeaturedOffer;
   }

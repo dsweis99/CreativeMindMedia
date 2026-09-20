@@ -3,7 +3,7 @@ import { Button } from '../components/ui/Button';
 import { SectionLabel } from '../components/ui/SectionLabel';
 import { Card } from '../components/ui/Card';
 import { Reveal } from '../components/ui/Reveal';
-import { ArrowRight, Target, PenTool, MonitorSmartphone } from 'lucide-react';
+import { ArrowRight, ExternalLink, Play, Target, PenTool, MonitorSmartphone } from 'lucide-react';
 import { FeaturedOfferModal } from '../components/FeaturedOfferModal';
 import { useFeaturedOffer } from '../hooks/useFeaturedOffer';
 
@@ -369,6 +369,18 @@ export function Home() {
           <Reveal delay={0.2}><h2 className="mt-5 font-display text-5xl leading-[0.95] tracking-wide sm:text-7xl">{offer.title}</h2></Reveal>
           <Reveal delay={0.3}><p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-[var(--color-text-muted)]">{offer.description}</p></Reveal>
           <Reveal delay={0.4}><button type="button" onClick={() => setFreeVideoOpen(true)} className="mt-10 bg-[var(--color-accent)] px-7 py-4 text-sm font-semibold uppercase tracking-wider text-[var(--color-accent-fg)] transition-transform hover:-translate-y-0.5">{offer.buttonLabel}</button></Reveal>
+          {offer.examplesEnabled && offer.examples.length > 0 && <div className="mt-16 border-t border-[var(--color-border-subtle)] pt-12 text-left">
+            <div className="mx-auto max-w-2xl text-center"><h3 className="font-display text-4xl tracking-wide sm:text-5xl">{offer.examplesHeading}</h3>{offer.examplesDescription && <p className="mt-3 text-sm leading-relaxed text-[var(--color-text-muted)]">{offer.examplesDescription}</p>}</div>
+            <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {offer.examples.map((example) => <article key={example.id} className="overflow-hidden border border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)]">
+                <div className="relative aspect-[4/5] bg-[var(--color-bg-secondary)]">
+                  {example.type === 'video' ? <video controls preload="metadata" className="h-full w-full object-cover"><source src={example.mediaUrl} /></video> : example.mediaUrl ? <img src={example.mediaUrl} alt={example.title} className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center text-[var(--color-text-muted)]">Add media in CRM</div>}
+                  {example.type === 'video' && !example.mediaUrl && <Play className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[var(--color-accent)]" />}
+                </div>
+                <div className="p-5"><p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-accent)]">{example.type === 'audit' ? 'Audit example' : example.type === 'video' ? 'Video example' : 'Work example'}</p><h4 className="mt-2 text-lg font-semibold">{example.title}</h4>{example.description && <p className="mt-2 text-sm leading-relaxed text-[var(--color-text-muted)]">{example.description}</p>}{example.actionUrl && <a href={example.actionUrl} target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-accent)]">View example <ExternalLink size={15} /></a>}</div>
+              </article>)}
+            </div>
+          </div>}
         </div>
       </section>}
 
