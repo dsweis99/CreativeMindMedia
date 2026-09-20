@@ -26,6 +26,19 @@ export function AdminLayout() {
     </nav>
   );
 
+  const adminTools = (
+    <div className="mt-5 border-t border-[var(--color-border-subtle)] pt-4">
+      <button type="button" title={!sidebarOpen ? 'Notifications' : undefined} className={`relative flex min-h-12 items-center rounded-sm text-sm font-medium text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-border-subtle)] hover:text-[var(--color-text-primary)] ${sidebarOpen ? 'w-full gap-3 px-4' : 'h-12 w-12 justify-center'}`}>
+        <Bell size={22} strokeWidth={2} /><span className="absolute right-3 top-3 h-2 w-2 rounded-full bg-[var(--color-accent)]" />
+        {sidebarOpen && <span>Notifications</span>}
+      </button>
+      <button type="button" title={!sidebarOpen ? 'Admin profile' : undefined} className={`mt-2 flex min-h-12 items-center rounded-sm text-left text-sm font-medium transition-colors hover:bg-[var(--color-border-subtle)] ${sidebarOpen ? 'w-full gap-3 px-4' : 'h-12 w-12 justify-center'}`}>
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent)] text-xs font-bold text-[var(--color-accent-fg)]">AS</span>
+        {sidebarOpen && <><span className="min-w-0 flex-1"><span className="block truncate font-semibold">Admin</span><span className="block text-xs text-[var(--color-text-muted)]">Super Admin</span></span><ChevronDown size={16} className="text-[var(--color-text-muted)]" /></>}
+      </button>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-[var(--color-bg-primary)] text-[var(--color-text-primary)]">
       <aside className={`fixed inset-y-0 left-0 z-40 hidden border-r border-[var(--color-border-subtle)] bg-[var(--color-bg-secondary)] p-6 transition-[width] duration-300 lg:flex lg:flex-col ${sidebarOpen ? 'w-72' : 'w-24'}`}>
@@ -33,6 +46,7 @@ export function AdminLayout() {
           <Logo className={sidebarOpen ? 'h-9' : 'h-8'} labelClassName={sidebarOpen ? '' : '!hidden'} />
         </button>
         {menu}
+        {adminTools}
         {sidebarOpen && <div className="mt-auto border-t border-[var(--color-border-subtle)] pt-6">
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--color-text-muted)]">Workspace</p>
           <p className="mt-2 text-sm font-medium">Creative Minds Media</p>
@@ -45,22 +59,13 @@ export function AdminLayout() {
           <Logo className="h-7" />
         </div>
         <p className="hidden text-sm text-[var(--color-text-muted)] lg:block">CMM Admin Workspace</p>
-        <div className="ml-auto flex items-center gap-4">
-          <button className="relative rounded-full p-2 text-[var(--color-text-muted)] hover:bg-[var(--color-border-subtle)] hover:text-[var(--color-text-primary)]" aria-label="Notifications">
-            <Bell size={20} /><span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-[var(--color-accent)]" />
-          </button>
-          <div className="flex items-center gap-3 border-l border-[var(--color-border-subtle)] pl-4">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-accent)] text-xs font-bold text-[var(--color-accent-fg)]">AS</div>
-            <div className="hidden sm:block"><p className="text-sm font-semibold">Admin</p><p className="text-xs text-[var(--color-text-muted)]">Super Admin</p></div>
-            <ChevronDown size={16} className="text-[var(--color-text-muted)]" />
-          </div>
-        </div>
       </header>
 
       {menuOpen && <div className="fixed inset-0 z-50 bg-black/50 lg:hidden" onClick={() => setMenuOpen(false)}>
         <aside className="h-full w-72 bg-[var(--color-bg-secondary)] p-6" onClick={(event) => event.stopPropagation()}>
           <div className="mb-12 flex items-center justify-between"><Logo className="h-8" /><button onClick={() => setMenuOpen(false)} className="p-2" aria-label="Close admin menu"><X size={22} /></button></div>
           {menu}
+          {adminTools}
         </aside>
       </div>}
 
