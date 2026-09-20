@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, NavLink, Outlet } from 'react-router-dom';
-import { Bell, ChevronDown, LayoutDashboard, Megaphone, Menu, PanelsTopLeft, Settings, UsersRound, X } from 'lucide-react';
+import { Bell, ChevronDown, LayoutDashboard, Megaphone, Menu, PanelsTopLeft, Settings, ShieldCheck, UsersRound, X } from 'lucide-react';
 import { Logo } from '../ui/Logo';
 
 const navigation = [
@@ -8,6 +8,7 @@ const navigation = [
   { label: 'Leads', to: '/admin/leads', icon: UsersRound },
   { label: 'Website Content', to: '/admin/content', icon: PanelsTopLeft },
   { label: 'Campaigns', to: '/admin/campaigns', icon: Megaphone },
+  { label: 'Team & Roles', to: '/admin/team', icon: ShieldCheck },
   { label: 'Settings', to: '/admin/settings', icon: Settings },
 ];
 
