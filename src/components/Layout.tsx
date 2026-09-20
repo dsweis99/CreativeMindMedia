@@ -15,9 +15,9 @@ export function Layout() {
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+
+    // CMM starts in dark mode unless this visitor deliberately chose light mode.
+    if (savedTheme !== 'light') {
       setIsDark(true);
       document.documentElement.classList.add('dark');
     } else {

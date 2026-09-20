@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Creative Minds Media — Portland Branding & Digital Marketing</title>
+    <script>
+      // Apply the default before React loads, so the site does not flash white.
+      if (localStorage.getItem('theme') !== 'light') document.documentElement.classList.add('dark');
+    </script>
   </head>
   <body>
     <script>
@@ -18,4 +22,3 @@
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-
