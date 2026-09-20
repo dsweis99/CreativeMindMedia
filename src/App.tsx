@@ -18,6 +18,7 @@ import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { AdminLeads } from './pages/admin/AdminLeads';
 import { AdminSettings } from './pages/admin/AdminSettings';
 import { AdminContent } from './pages/admin/AdminContent';
+import { AdminCampaigns } from './pages/admin/AdminCampaigns';
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
           <Route index element={<AdminDashboard />} />
           <Route path="leads" element={<AdminLeads />} />
           <Route path="content" element={<AdminContent />} />
+          <Route path="campaigns" element={<AdminCampaigns />} />
           <Route path="settings" element={<AdminSettings />} />
         </Route>
         <Route path="/" element={<Layout />}>

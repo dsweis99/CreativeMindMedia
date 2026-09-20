@@ -1,11 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '../components/ui/Button';
 import { SectionLabel } from '../components/ui/SectionLabel';
 import { Card } from '../components/ui/Card';
 import { Reveal } from '../components/ui/Reveal';
 import { ArrowRight, Target, PenTool, MonitorSmartphone } from 'lucide-react';
+import { FeaturedOfferModal } from '../components/FeaturedOfferModal';
+import { useFeaturedOffer } from '../hooks/useFeaturedOffer';
 
 export function Home() {
+  const [freeVideoOpen, setFreeVideoOpen] = useState(false);
+  const { offer } = useFeaturedOffer();
+
   return (
     <div className="w-full">
       {/* HERO SECTION */}
@@ -357,6 +362,17 @@ export function Home() {
           </Reveal>
         </div>
       </section>
+
+      {offer.enabled && <section className="border-y border-[var(--color-border-subtle)] bg-[var(--color-card-bg)] py-24 sm:py-32">
+        <div className="mx-auto max-w-4xl px-6 text-center">
+          <Reveal delay={0.1}><p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-accent)]">{offer.eyebrow}</p></Reveal>
+          <Reveal delay={0.2}><h2 className="mt-5 font-display text-5xl leading-[0.95] tracking-wide sm:text-7xl">{offer.title}</h2></Reveal>
+          <Reveal delay={0.3}><p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-[var(--color-text-muted)]">{offer.description}</p></Reveal>
+          <Reveal delay={0.4}><button type="button" onClick={() => setFreeVideoOpen(true)} className="mt-10 bg-[var(--color-accent)] px-7 py-4 text-sm font-semibold uppercase tracking-wider text-[var(--color-accent-fg)] transition-transform hover:-translate-y-0.5">{offer.buttonLabel}</button></Reveal>
+        </div>
+      </section>}
+
+      <FeaturedOfferModal isOpen={freeVideoOpen} offer={offer} onClose={() => setFreeVideoOpen(false)} />
     </div>
   );
 }
