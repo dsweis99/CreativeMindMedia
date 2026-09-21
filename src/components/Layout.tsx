@@ -177,9 +177,9 @@ export function Layout() {
 
       <footer className="bg-[var(--color-bg-secondary)] border-t border-[var(--color-border-subtle)] pt-24 pb-12">
         <div className="max-w-7xl mx-auto px-6 md:px-8 lg:px-[60px]">
-          <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-[1.3fr_0.85fr_1fr_1fr_1.35fr] lg:gap-8 mb-16">
+          <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-[1.6fr_0.8fr_0.95fr_1fr_1.3fr] lg:gap-8 mb-16">
             <div>
-              <Logo className="h-12 gap-5 mb-7" labelClassName="text-2xl md:text-3xl" />
+              <Logo className="h-20 md:h-24 gap-6 mb-8" labelClassName="text-3xl md:text-4xl" />
               <p className="text-[var(--color-text-muted)] text-sm mb-6">
                 Serving Portland businesses and growing brands nationwide.
               </p>
@@ -197,7 +197,7 @@ export function Layout() {
             </div>
             
             <div>
-              <h4 className="font-display text-xl tracking-wider mb-6 lg:mt-3">Quick Links</h4>
+              <h4 className="font-display text-xl tracking-wider mb-6 lg:mt-7">Quick Links</h4>
               <ul className="space-y-4">
                 <li><Link to="/" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors text-sm">Home</Link></li>
                 <li><Link to="/about" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors text-sm">About Us</Link></li>
@@ -207,7 +207,7 @@ export function Layout() {
             </div>
 
             <div>
-              <h4 className="font-display text-xl tracking-wider mb-6 lg:mt-3">Services</h4>
+              <h4 className="font-display text-xl tracking-wider mb-6 lg:mt-7">Services</h4>
               <ul className="space-y-4">
                 <li><Link to="/services" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors text-sm">Brand Strategy</Link></li>
                 <li><Link to="/services" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors text-sm">Content & Creative</Link></li>
@@ -216,7 +216,7 @@ export function Layout() {
             </div>
 
             <div>
-              <h4 className="font-display text-xl tracking-wider mb-6 lg:mt-3">Contact</h4>
+              <h4 className="font-display text-xl tracking-wider mb-6 lg:mt-7">Contact</h4>
               <ul className="space-y-4">
                 <li className="text-[var(--color-text-muted)] text-sm">Portland, OR 97220</li>
                 <li><a href="tel:19719986878" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors text-sm">1 (971) 998-6878</a></li>
