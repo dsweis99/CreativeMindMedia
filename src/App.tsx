@@ -20,6 +20,8 @@ import { AdminSettings } from './pages/admin/AdminSettings';
 import { AdminContent } from './pages/admin/AdminContent';
 import { AdminCampaigns } from './pages/admin/AdminCampaigns';
 import { AdminTeam } from './pages/admin/AdminTeam';
+import { AdminNewsletter } from './pages/admin/AdminNewsletter';
+import { AdminProfile } from './pages/admin/AdminProfile';
 
 export default function App() {
   return (
@@ -30,6 +32,8 @@ export default function App() {
           <Route path="leads" element={<AdminLeads />} />
           <Route path="content" element={<AdminContent />} />
           <Route path="campaigns" element={<AdminCampaigns />} />
+          <Route path="newsletter" element={<AdminNewsletter />} />
+          <Route path="profile" element={<AdminProfile />} />
           <Route path="team" element={<AdminTeam />} />
           <Route path="settings" element={<AdminSettings />} />
         </Route>
