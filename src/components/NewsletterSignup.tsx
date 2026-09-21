@@ -25,16 +25,14 @@ export function NewsletterSignup() {
   };
 
   return (
-    <section className="border-b border-[var(--color-border-subtle)] pb-16">
-      <div className="max-w-2xl">
-        <h2 className="max-w-xl text-3xl font-semibold leading-tight tracking-tight text-[var(--color-text-primary)] sm:text-4xl">{settings.title}</h2>
-        <form onSubmit={submit} className="mt-8 flex max-w-xl flex-col gap-3 sm:flex-row">
-          <label className="sr-only" htmlFor="footerNewsletterEmail">Email address</label>
-          <input id="footerNewsletterEmail" type="email" required value={email} onChange={(event) => { setEmail(event.target.value); setMessage(''); }} placeholder={settings.placeholder} className="min-h-12 flex-1 border border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] px-4 text-sm text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-muted)] focus:border-[var(--color-accent)]" />
-          <button type="submit" className="min-h-12 bg-[var(--color-accent)] px-7 text-sm font-semibold uppercase tracking-wide text-[var(--color-accent-fg)] transition-opacity hover:opacity-90">{settings.buttonLabel}</button>
-        </form>
-        {message && <p className="mt-3 flex items-center gap-2 text-sm text-emerald-500"><CheckCircle2 size={16} />{message}</p>}
-      </div>
-    </section>
+    <div>
+      <h2 className="font-display text-xl leading-tight tracking-wider lg:mt-3">{settings.title}</h2>
+      <form onSubmit={submit} className="mt-4 flex">
+        <label className="sr-only" htmlFor="footerNewsletterEmail">Email address</label>
+        <input id="footerNewsletterEmail" type="email" required value={email} onChange={(event) => { setEmail(event.target.value); setMessage(''); }} placeholder={settings.placeholder} className="min-w-0 flex-1 border border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] px-3 py-2 text-xs text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-muted)] focus:border-[var(--color-accent)]" />
+        <button type="submit" className="shrink-0 bg-[var(--color-accent)] px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-[var(--color-accent-fg)] transition-opacity hover:opacity-90">{settings.buttonLabel}</button>
+      </form>
+      {message && <p className="mt-3 flex items-start gap-1.5 text-xs leading-relaxed text-emerald-500"><CheckCircle2 size={14} className="mt-0.5 shrink-0" />{message}</p>}
+    </div>
   );
 }

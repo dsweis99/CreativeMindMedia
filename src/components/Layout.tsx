@@ -177,8 +177,7 @@ export function Layout() {
 
       <footer className="bg-[var(--color-bg-secondary)] border-t border-[var(--color-border-subtle)] pt-24 pb-12">
         <div className="max-w-7xl mx-auto px-6 md:px-8 lg:px-[60px]">
-          <NewsletterSignup />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pt-16 mb-16">
+          <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-[1.3fr_0.85fr_1fr_1fr_1.35fr] lg:gap-8 mb-16">
             <div>
               <Logo className="h-12 gap-5 mb-7" labelClassName="text-2xl md:text-3xl" />
               <p className="text-[var(--color-text-muted)] text-sm mb-6">
@@ -224,6 +223,8 @@ export function Layout() {
                 <li><a href="mailto:hello@creativemindsmedia.com" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors text-sm">hello@creativemindsmedia.com</a></li>
               </ul>
             </div>
+
+            <NewsletterSignup />
           </div>
 
           <div className="border-t border-[var(--color-border-subtle)] pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
