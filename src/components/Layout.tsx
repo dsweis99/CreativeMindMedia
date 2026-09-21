@@ -232,8 +232,8 @@ export function Layout() {
               Creative Minds Media ® All Rights Reserved 2025
             </p>
             <div className="flex gap-6">
-              <Link to="#" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors text-xs">Privacy Policy</Link>
-              <Link to="#" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors text-xs">Terms</Link>
+              <Link to="/privacy-policy" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors text-xs">Privacy Policy</Link>
+              <Link to="/terms-and-conditions" className="text-[var(--color-text-muted)] hover:text-[var(--color-accent)] transition-colors text-xs">Terms &amp; Conditions</Link>
             </div>
           </div>
         </div>

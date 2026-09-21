@@ -12,6 +12,8 @@ import { Work } from './pages/Work';
 import { CaseStudy } from './pages/CaseStudy';
 import { Services } from './pages/Services';
 import { Contact } from './pages/Contact';
+import { PrivacyPolicy } from './pages/PrivacyPolicy';
+import { TermsAndConditions } from './pages/TermsAndConditions';
 import { NotFound } from './pages/NotFound';
 import { AdminLayout } from './components/admin/AdminLayout';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
@@ -44,6 +46,8 @@ export default function App() {
           <Route path="work/:projectId" element={<CaseStudy />} />
           <Route path="services" element={<Services />} />
           <Route path="contact" element={<Contact />} />
+          <Route path="privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="terms-and-conditions" element={<TermsAndConditions />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
