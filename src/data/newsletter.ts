@@ -9,6 +9,8 @@ export type NewsletterSubscriber = {
   id: string;
   email: string;
   subscribedAt: string;
+  type: 'individual' | 'company';
+  saved: boolean;
 };
 
 const SETTINGS_KEY = 'cmm-newsletter-settings';
@@ -39,17 +41,29 @@ export const saveNewsletterSettings = (settings: NewsletterSettings) => {
 export const getNewsletterSubscribers = (): NewsletterSubscriber[] => {
   try {
     const stored = localStorage.getItem(SUBSCRIBERS_KEY);
-    return stored ? JSON.parse(stored) : [];
+    const subscribers = stored ? JSON.parse(stored) : [];
+    return subscribers.map((subscriber: Partial<NewsletterSubscriber> & { email: string }) => ({
+      ...subscriber,
+      type: subscriber.type ?? getSubscriberTypeFromEmail(subscriber.email),
+      saved: subscriber.saved ?? false,
+    }));
   } catch {
     return [];
   }
 };
 
+const personalEmailDomains = new Set(['gmail.com', 'googlemail.com', 'outlook.com', 'hotmail.com', 'live.com', 'yahoo.com', 'icloud.com', 'aol.com', 'proton.me', 'protonmail.com']);
+export const getSubscriberTypeFromEmail = (email: string): NewsletterSubscriber['type'] => personalEmailDomains.has(email.split('@')[1]?.toLowerCase()) ? 'individual' : 'company';
+
+export const saveNewsletterSubscribers = (subscribers: NewsletterSubscriber[]) => {
+  localStorage.setItem(SUBSCRIBERS_KEY, JSON.stringify(subscribers));
+  window.dispatchEvent(new Event(NEWSLETTER_UPDATED_EVENT));
+};
+
 export const subscribeToNewsletter = (email: string): 'added' | 'exists' => {
   const subscribers = getNewsletterSubscribers();
   if (subscribers.some((subscriber) => subscriber.email.toLowerCase() === email.toLowerCase())) return 'exists';
-  const next = [{ id: crypto.randomUUID(), email, subscribedAt: new Date().toISOString() }, ...subscribers];
-  localStorage.setItem(SUBSCRIBERS_KEY, JSON.stringify(next));
-  window.dispatchEvent(new Event(NEWSLETTER_UPDATED_EVENT));
+  const next = [{ id: crypto.randomUUID(), email, subscribedAt: new Date().toISOString(), type: getSubscriberTypeFromEmail(email), saved: false }, ...subscribers];
+  saveNewsletterSubscribers(next);
   return 'added';
 };
