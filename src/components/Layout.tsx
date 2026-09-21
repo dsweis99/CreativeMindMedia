@@ -5,6 +5,7 @@ import { Button } from './ui/Button';
 import { Logo } from './ui/Logo';
 import { Instagram, Facebook, Linkedin, Sun, Moon, Menu, X, ArrowUp, ArrowDown } from 'lucide-react';
 import { socialLinks } from '../data/socials';
+import { NewsletterSignup } from './NewsletterSignup';
 
 export function Layout() {
   const [scrolled, setScrolled] = useState(false);
@@ -176,7 +177,8 @@ export function Layout() {
 
       <footer className="bg-[var(--color-bg-secondary)] border-t border-[var(--color-border-subtle)] pt-24 pb-12">
         <div className="max-w-7xl mx-auto px-6 md:px-8 lg:px-[60px]">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+          <NewsletterSignup />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pt-16 mb-16">
             <div>
               <Logo className="h-12 gap-5 mb-7" labelClassName="text-2xl md:text-3xl" />
               <p className="text-[var(--color-text-muted)] text-sm mb-6">
