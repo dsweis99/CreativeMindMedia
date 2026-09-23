@@ -28,23 +28,25 @@ export function NewsletterSignup() {
     setIsError(false);
 
     const { error } = await supabase
-      .from('newsletter_subscribers')
-      .upsert(
-        { email: cleanEmail, subscriber_type: 'individual' },
-        { onConflict: 'email', ignoreDuplicates: true },
-      );
+      .from(‘newsletter_subscribers’)
+      .insert({ email: cleanEmail, subscriber_type: ‘individual’ });
 
     setIsSubmitting(false);
 
     if (error) {
-      console.error('Newsletter subscription error:', error);
+      console.error(‘Newsletter subscription error:’, error);
       setIsError(true);
-      setMessage('Something went wrong — please try again.');
+      if (error.code === ‘23505’) {
+        setIsError(false);
+        setMessage(‘You\’re already subscribed.’);
+      } else {
+        setMessage(error.message);
+      }
       return;
     }
 
-    setEmail('');
-    setMessage('You’re subscribed — thank you.');
+    setEmail(‘’);
+    setMessage("You’re subscribed — thank you.");
   };
 
   return (
