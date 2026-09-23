@@ -47,7 +47,8 @@ export function Contact() {
     const firstName = String(data.get('firstName') ?? '').trim();
     const lastName = String(data.get('lastName') ?? '').trim();
     const { error } = await insertLead({
-      name: `${firstName} ${lastName}`.trim(),
+      first_name: firstName,
+      last_name: lastName,
       company: '',
       email: String(data.get('email') ?? '').trim(),
       phone: String(data.get('phone') ?? '').trim(),

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Eye, EyeOff, FileText, Loader2, Pencil, Save } from 'lucide-react';
-import { fetchSiteContent, upsertPageContent, type SiteContentRow } from '../../lib/db';
+import { fetchSiteContent, upsertPageContent } from '../../lib/db';
+import { useAuth } from '../../context/AuthContext';
 
 type PageId = 'home' | 'about' | 'work' | 'services' | 'contact';
 
@@ -12,7 +13,8 @@ const pages: Array<{ id: PageId; name: string; description: string; sections: st
   { id: 'contact', name: 'Contact', description: 'Contact details and quote request.', sections: ['Hero banner', 'Contact information', 'Quote request form', 'FAQs', 'Location'], defaultTitle: 'Start your project.', defaultIntro: 'Tell us what you are building and we will take it from there.' },
 ];
 
-type ContentMap = Record<PageId, { title: string; intro: string; sections: Record<string, boolean> }>;
+type PageContent = { title: string; intro: string; sections: Record<string, boolean> };
+type ContentMap = Record<PageId, PageContent>;
 
 function buildDefaultContent(): ContentMap {
   return Object.fromEntries(
@@ -21,6 +23,7 @@ function buildDefaultContent(): ContentMap {
 }
 
 export function AdminContent() {
+  const { adminUser } = useAuth();
   const [selectedPage, setSelectedPage] = useState<PageId>('home');
   const [content, setContent] = useState<ContentMap>(buildDefaultContent);
   const [loading, setLoading] = useState(true);
@@ -32,17 +35,24 @@ export function AdminContent() {
       if (data && data.length > 0) {
         setContent((prev) => {
           const next = { ...prev };
-          (data as SiteContentRow[]).forEach((row) => {
-            if (row.page_id in next) {
-              const sections = Object.fromEntries(
-                pages.find((p) => p.id === row.page_id)!.sections.map((s) => {
-                  const found = row.sections?.find((rs) => rs.name === s);
-                  return [s, found ? found.visible : true];
-                })
-              );
-              next[row.page_id as PageId] = { title: row.title, intro: row.intro, sections };
-            }
-          });
+          for (const row of data as Array<{ page_key: string; content: Record<string, unknown> }>) {
+            const pageId = row.page_key as PageId;
+            if (!(pageId in next)) continue;
+            const c = row.content ?? {};
+            const pageDef = pages.find((p) => p.id === pageId)!;
+            const rawSections = Array.isArray(c.sections) ? (c.sections as Array<{ name: string; visible: boolean }>) : [];
+            const sections = Object.fromEntries(
+              pageDef.sections.map((s) => {
+                const found = rawSections.find((rs) => rs.name === s);
+                return [s, found ? found.visible : true];
+              })
+            );
+            next[pageId] = {
+              title: typeof c.title === 'string' ? c.title : prev[pageId].title,
+              intro: typeof c.intro === 'string' ? c.intro : prev[pageId].intro,
+              sections,
+            };
+          }
           return next;
         });
       }
@@ -66,7 +76,11 @@ export function AdminContent() {
   const handleSave = async () => {
     setSaving(true);
     const sections = page.sections.map((name) => ({ name, visible: pageContent.sections[name] ?? true }));
-    await upsertPageContent({ page_id: selectedPage, title: pageContent.title, intro: pageContent.intro, sections });
+    await upsertPageContent(
+      selectedPage,
+      { title: pageContent.title, intro: pageContent.intro, sections },
+      adminUser?.user.id ?? null,
+    );
     setSaving(false);
     setSaved(true);
   };

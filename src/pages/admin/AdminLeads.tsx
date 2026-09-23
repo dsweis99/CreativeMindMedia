@@ -5,6 +5,10 @@ import { statusStyles } from '../../data/admin';
 
 const ALL_STATUSES: LeadStatus[] = ['New', 'Contacted', 'Qualified', 'Won', 'Lost'];
 
+function leadName(lead: Lead) {
+  return `${lead.first_name ?? ''} ${lead.last_name ?? ''}`.trim();
+}
+
 export function AdminLeads() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,7 +36,7 @@ export function AdminLeads() {
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
     return leads.filter((l) => {
-      if (q && !l.name.toLowerCase().includes(q) && !l.company.toLowerCase().includes(q) && !l.email.toLowerCase().includes(q) && !l.service.toLowerCase().includes(q)) return false;
+      if (q && !leadName(l).toLowerCase().includes(q) && !l.company.toLowerCase().includes(q) && !l.email.toLowerCase().includes(q) && !l.service.toLowerCase().includes(q)) return false;
       if (statusFilter && l.status !== statusFilter) return false;
       if (sourceFilter && l.source !== sourceFilter) return false;
       if (serviceFilter && l.service !== serviceFilter) return false;
@@ -128,7 +132,7 @@ export function AdminLeads() {
             filtered.map((lead) => (
               <article key={lead.id} className="grid gap-3 border-b border-[var(--color-border-subtle)] px-5 py-5 last:border-0 md:grid-cols-[1.25fr_1fr_0.9fr_0.85fr_1fr_0.8fr] md:items-center md:gap-4 md:px-6">
                 <div>
-                  <p className="font-semibold">{lead.name}</p>
+                  <p className="font-semibold">{leadName(lead)}</p>
                   <p className="mt-1 text-sm text-[var(--color-text-muted)]">{lead.company ? `${lead.company} · ` : ''}{lead.email}</p>
                 </div>
                 <p className="text-sm"><span className="mr-2 text-xs font-semibold uppercase tracking-wide text-[var(--color-text-muted)] md:hidden">Service </span>{lead.service || '—'}</p>

@@ -31,16 +31,16 @@ export function AdminNewsletter() {
     const q = search.toLowerCase();
     return subscribers.filter((s) => {
       if (q && !s.email.toLowerCase().includes(q)) return false;
-      if (typeFilter !== 'all' && s.type !== typeFilter) return false;
-      if (savedFilter && !s.saved) return false;
+      if (typeFilter !== 'all' && s.subscriber_type !== typeFilter) return false;
+      if (savedFilter && !s.is_saved) return false;
       return true;
     });
   }, [subscribers, search, typeFilter, savedFilter]);
 
   const stats = useMemo(() => ({
     total: subscribers.length,
-    companies: subscribers.filter((s) => s.type === 'company').length,
-    individuals: subscribers.filter((s) => s.type === 'individual').length,
+    companies: subscribers.filter((s) => s.subscriber_type === 'company').length,
+    individuals: subscribers.filter((s) => s.subscriber_type === 'individual').length,
   }), [subscribers]);
 
   const allSelected = filtered.length > 0 && filtered.every((s) => selected.has(s.id));
@@ -51,7 +51,7 @@ export function AdminNewsletter() {
   const toggleAll = () =>
     setSelected(allSelected ? new Set() : new Set(filtered.map((s) => s.id)));
 
-  const patchSubscriber = async (id: string, patch: Partial<Pick<Subscriber, 'type' | 'saved'>>) => {
+  const patchSubscriber = async (id: string, patch: Partial<Pick<Subscriber, 'subscriber_type' | 'is_saved'>>) => {
     await updateSubscriber(id, patch);
     setSubscribers((prev) => prev.map((s) => s.id === id ? { ...s, ...patch } : s));
   };
@@ -64,7 +64,7 @@ export function AdminNewsletter() {
 
   const exportCsv = () => {
     const rows = (selected.size > 0 ? filtered.filter((s) => selected.has(s.id)) : filtered);
-    const csv = ['Email,Type,Saved,Subscribed At', ...rows.map((s) => `${s.email},${s.type},${s.saved},${s.subscribed_at}`)].join('\n');
+    const csv = ['Email,Type,Saved,Subscribed At', ...rows.map((s) => `${s.email},${s.subscriber_type},${s.is_saved},${s.subscribed_at}`)].join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href = url; a.download = 'newsletter-subscribers.csv'; a.click();
@@ -77,6 +77,8 @@ export function AdminNewsletter() {
     setSettingsSaved(true);
     setTimeout(() => setSettingsSaved(false), 3000);
   };
+
+  void settings;
 
   return (
     <div className="mx-auto max-w-7xl">
@@ -151,12 +153,12 @@ export function AdminNewsletter() {
                 <div key={sub.id} className="grid grid-cols-[2rem_1fr] items-center gap-3 border-b border-[var(--color-border-subtle)] px-5 py-4 last:border-0 sm:grid-cols-[2rem_1.8fr_0.9fr_0.6fr_0.6fr_2rem]">
                   <input type="checkbox" checked={selected.has(sub.id)} onChange={() => toggleSelect(sub.id)} className="h-4 w-4 accent-[var(--color-accent)]" />
                   <p className="truncate text-sm font-medium">{sub.email}</p>
-                  <select value={sub.type} onChange={(e) => patchSubscriber(sub.id, { type: e.target.value as 'individual' | 'company' })} className="border border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] px-2 py-1 text-xs outline-none focus:border-[var(--color-accent)]">
+                  <select value={sub.subscriber_type} onChange={(e) => patchSubscriber(sub.id, { subscriber_type: e.target.value as 'individual' | 'company' })} className="border border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] px-2 py-1 text-xs outline-none focus:border-[var(--color-accent)]">
                     <option value="individual">Individual</option>
                     <option value="company">Company</option>
                   </select>
-                  <button onClick={() => patchSubscriber(sub.id, { saved: !sub.saved })} className={`flex h-7 w-7 items-center justify-center rounded-sm transition-colors ${sub.saved ? 'text-[var(--color-accent)]' : 'text-[var(--color-text-muted)] hover:text-[var(--color-accent)]'}`}>
-                    {sub.saved ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
+                  <button onClick={() => patchSubscriber(sub.id, { is_saved: !sub.is_saved })} className={`flex h-7 w-7 items-center justify-center rounded-sm transition-colors ${sub.is_saved ? 'text-[var(--color-accent)]' : 'text-[var(--color-text-muted)] hover:text-[var(--color-accent)]'}`}>
+                    {sub.is_saved ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
                   </button>
                   <p className="text-xs text-[var(--color-text-muted)]">{new Date(sub.subscribed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
                   <button onClick={() => removeSubscriber(sub.id)} className="flex h-7 w-7 items-center justify-center text-[var(--color-text-muted)] hover:text-red-500 transition-colors"><Trash2 size={15} /></button>

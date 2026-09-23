@@ -25,7 +25,7 @@ export function AdminLayout() {
   const { adminUser, signOut } = useAuth();
   const navigate = useNavigate();
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   useEffect(() => {
     if (!adminUser) return;
@@ -67,7 +67,7 @@ export function AdminLayout() {
           <div className="flex items-center justify-between gap-3">
             <div><p className="font-semibold">Notifications</p><p className="mt-0.5 text-xs text-[var(--color-text-muted)]">Your latest workspace updates.</p></div>
             {unreadCount > 0 && adminUser && (
-              <button type="button" onClick={async () => { await markAllNotificationsRead(adminUser.user.id); setNotifications((n) => n.map((item) => ({ ...item, read: true }))); }} className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--color-accent)]"><CheckCheck size={15} />Mark all read</button>
+              <button type="button" onClick={async () => { await markAllNotificationsRead(adminUser.user.id); setNotifications((n) => n.map((item) => ({ ...item, is_read: true }))); }} className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--color-accent)]"><CheckCheck size={15} />Mark all read</button>
             )}
           </div>
           <div className="mt-4 divide-y divide-[var(--color-border-subtle)] border-y border-[var(--color-border-subtle)]">
@@ -76,12 +76,12 @@ export function AdminLayout() {
             ) : notifications.map((n) => (
               <div key={n.id} className="py-3">
                 <p className="flex items-center gap-2 text-sm font-medium">
-                  {!n.read && <CircleDot size={14} className="shrink-0 text-[var(--color-accent)]" />}
+                  {!n.is_read && <CircleDot size={14} className="shrink-0 text-[var(--color-accent)]" />}
                   {n.title}
                 </p>
                 {n.message && <p className="mt-1 text-xs leading-relaxed text-[var(--color-text-muted)]">{n.message}</p>}
-                {!n.read && (
-                  <button type="button" onClick={async () => { await markNotificationRead(n.id); setNotifications((prev) => prev.map((item) => item.id === n.id ? { ...item, read: true } : item)); }} className="mt-1.5 text-[10px] font-semibold text-[var(--color-accent)] hover:underline">Mark read</button>
+                {!n.is_read && (
+                  <button type="button" onClick={async () => { await markNotificationRead(n.id); setNotifications((prev) => prev.map((item) => item.id === n.id ? { ...item, is_read: true } : item)); }} className="mt-1.5 text-[10px] font-semibold text-[var(--color-accent)] hover:underline">Mark read</button>
                 )}
               </div>
             ))}

@@ -6,34 +6,37 @@ export type LeadStatus = 'New' | 'Contacted' | 'Qualified' | 'Won' | 'Lost';
 
 export interface Lead {
   id: string;
-  name: string;
-  company: string;
+  first_name: string;
+  last_name: string;
   email: string;
   phone: string;
+  company: string;
   service: string;
+  message: string;
   source: string;
   status: LeadStatus;
-  message: string;
   created_at: string;
 }
 
 export interface Subscriber {
   id: string;
   email: string;
+  subscriber_type: 'individual' | 'company';
+  company_name: string | null;
+  is_saved: boolean;
   subscribed_at: string;
-  type: 'individual' | 'company';
-  saved: boolean;
 }
 
 export interface SiteContentRow {
-  page_id: string;
-  title: string;
-  intro: string;
-  sections: Array<{ name: string; visible: boolean }>;
+  id: string;
+  page_key: string;
+  content: Record<string, unknown>;
+  updated_by: string | null;
   updated_at: string;
 }
 
 export interface CampaignExample {
+  id?: string;
   type: 'video' | 'audit' | 'image';
   title: string;
   mediaUrl: string;
@@ -57,10 +60,17 @@ export interface Campaign {
 
 export interface Notification {
   id: string;
-  admin_id: string;
+  user_id: string;
   title: string;
   message: string;
-  read: boolean;
+  is_read: boolean;
+  created_at: string;
+}
+
+export interface Profile {
+  id: string;
+  full_name: string;
+  role: string;
   created_at: string;
 }
 
@@ -80,13 +90,13 @@ export const updateLeadStatus = (id: string, status: LeadStatus) =>
 export const fetchSubscribers = () =>
   supabase.from('newsletter_subscribers').select('*').order('subscribed_at', { ascending: false });
 
-export const upsertSubscriber = (email: string, type: 'individual' | 'company') =>
+export const upsertSubscriber = (email: string, subscriber_type: 'individual' | 'company') =>
   supabase
     .from('newsletter_subscribers')
-    .upsert({ email, type, saved: false }, { onConflict: 'email', ignoreDuplicates: true })
+    .upsert({ email, subscriber_type }, { onConflict: 'email', ignoreDuplicates: true })
     .select();
 
-export const updateSubscriber = (id: string, patch: Partial<Pick<Subscriber, 'type' | 'saved'>>) =>
+export const updateSubscriber = (id: string, patch: Partial<Pick<Subscriber, 'subscriber_type' | 'is_saved'>>) =>
   supabase.from('newsletter_subscribers').update(patch).eq('id', id);
 
 export const deleteSubscriber = (id: string) =>
@@ -97,10 +107,10 @@ export const deleteSubscriber = (id: string) =>
 export const fetchSiteContent = () =>
   supabase.from('site_content').select('*');
 
-export const upsertPageContent = (row: Omit<SiteContentRow, 'updated_at'>) =>
+export const upsertPageContent = (page_key: string, content: Record<string, unknown>, updated_by?: string | null) =>
   supabase.from('site_content').upsert(
-    { ...row, updated_at: new Date().toISOString() },
-    { onConflict: 'page_id' },
+    { page_key, content, updated_by: updated_by ?? null, updated_at: new Date().toISOString() },
+    { onConflict: 'page_key' },
   );
 
 // ─── Campaigns ───────────────────────────────────────────────────────────────
@@ -116,16 +126,24 @@ export const upsertCampaign = (campaign: Omit<Campaign, 'created_at' | 'updated_
 
 // ─── Notifications ────────────────────────────────────────────────────────────
 
-export const fetchNotifications = (adminId: string) =>
+export const fetchNotifications = (userId: string) =>
   supabase
     .from('notifications')
     .select('*')
-    .eq('admin_id', adminId)
+    .eq('user_id', userId)
     .order('created_at', { ascending: false })
     .limit(20);
 
 export const markNotificationRead = (id: string) =>
-  supabase.from('notifications').update({ read: true }).eq('id', id);
+  supabase.from('notifications').update({ is_read: true }).eq('id', id);
 
-export const markAllNotificationsRead = (adminId: string) =>
-  supabase.from('notifications').update({ read: true }).eq('admin_id', adminId).eq('read', false);
+export const markAllNotificationsRead = (userId: string) =>
+  supabase.from('notifications').update({ is_read: true }).eq('user_id', userId).eq('is_read', false);
+
+// ─── Profiles ────────────────────────────────────────────────────────────────
+
+export const fetchProfiles = () =>
+  supabase.from('profiles').select('id, full_name, role, created_at').order('created_at', { ascending: true });
+
+export const updateProfileName = (id: string, full_name: string) =>
+  supabase.from('profiles').update({ full_name }).eq('id', id);
