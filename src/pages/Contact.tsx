@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '../components/ui/Button';
 import { SectionLabel } from '../components/ui/SectionLabel';
+import { insertLead } from '../lib/db';
 import { Card } from '../components/ui/Card';
 import { Reveal } from '../components/ui/Reveal';
 import { ChevronDown, CheckCircle2, Phone, MapPin, Instagram, Facebook, Linkedin } from 'lucide-react';
@@ -34,16 +35,31 @@ const categories = [
 export function Contact() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [formState, setFormState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const toggleService = (item: string) =>
+    setSelectedServices((prev) => prev.includes(item) ? prev.filter((s) => s !== item) : [...prev, item]);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setFormState('submitting');
-    // Simulate API call
-    setTimeout(() => {
-      setFormState('success');
-      // Reset form after 3 seconds
-      setTimeout(() => setFormState('idle'), 3000);
-    }, 1500);
+    const data = new FormData(e.currentTarget);
+    const firstName = String(data.get('firstName') ?? '').trim();
+    const lastName = String(data.get('lastName') ?? '').trim();
+    const { error } = await insertLead({
+      name: `${firstName} ${lastName}`.trim(),
+      company: '',
+      email: String(data.get('email') ?? '').trim(),
+      phone: String(data.get('phone') ?? '').trim(),
+      message: String(data.get('projectDetails') ?? '').trim(),
+      service: selectedServices.join(', '),
+      source: 'Website',
+      status: 'New',
+    });
+    if (error) { setFormState('error'); return; }
+    setFormState('success');
+    setSelectedServices([]);
+    setTimeout(() => setFormState('idle'), 4000);
   };
 
   return (
@@ -178,7 +194,13 @@ export function Contact() {
                         {category.items.map(item => (
                           <label key={item} className="flex items-center gap-4 cursor-pointer group w-fit mx-auto md:mx-0">
                             <div className="relative flex items-center justify-center w-5 h-5 border border-[var(--color-border-subtle)] rounded-sm bg-transparent group-hover:border-[var(--color-accent)] transition-colors flex-shrink-0">
-                              <input type="checkbox" className="peer sr-only" disabled={formState !== 'idle'} />
+                              <input
+                                type="checkbox"
+                                className="peer sr-only"
+                                checked={selectedServices.includes(item)}
+                                onChange={() => toggleService(item)}
+                                disabled={formState !== 'idle'}
+                              />
                               <div className="absolute inset-0 bg-[var(--color-accent)] scale-0 peer-checked:scale-100 transition-transform duration-200 rounded-sm flex items-center justify-center">
                                 <svg className="w-3.5 h-3.5 text-[var(--color-accent-fg)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />

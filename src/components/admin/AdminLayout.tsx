@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Link, NavLink, Outlet } from 'react-router-dom';
-import { Bell, CheckCheck, ChevronDown, CircleDot, LayoutDashboard, Mail, Megaphone, Menu, PanelsTopLeft, Settings, ShieldCheck, UsersRound, X } from 'lucide-react';
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { Bell, CheckCheck, ChevronDown, CircleDot, LayoutDashboard, LogOut, Mail, Megaphone, Menu, PanelsTopLeft, Settings, ShieldCheck, UsersRound, X } from 'lucide-react';
 import { Logo } from '../ui/Logo';
 import { ADMIN_PROFILE_UPDATED_EVENT, getAdminProfile, getProfileInitials, type AdminProfile } from '../../data/adminProfile';
+import { useAuth } from '../../context/AuthContext';
+import { fetchNotifications, markAllNotificationsRead, markNotificationRead, type Notification } from '../../lib/db';
 
 const navigation = [
   { label: 'Dashboard', to: '/admin', icon: LayoutDashboard, end: true },
@@ -18,8 +20,24 @@ export function AdminLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [unread, setUnread] = useState(true);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [profile, setProfile] = useState<AdminProfile>(() => getAdminProfile());
+  const { adminUser, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
+  useEffect(() => {
+    if (!adminUser) return;
+    fetchNotifications(adminUser.user.id).then(({ data }) => {
+      if (data) setNotifications(data as Notification[]);
+    });
+  }, [adminUser]);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/admin/login', { replace: true });
+  };
 
   useEffect(() => {
     const refreshProfile = () => setProfile(getAdminProfile());
@@ -41,14 +59,43 @@ export function AdminLayout() {
   const adminTools = (
     <div className="relative mt-5 border-t border-[var(--color-border-subtle)] pt-4 lg:mt-auto">
       <button type="button" onClick={() => setNotificationsOpen((open) => !open)} title={!sidebarOpen ? 'Notifications' : undefined} className={`relative flex min-h-12 items-center rounded-sm text-sm font-medium text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-border-subtle)] hover:text-[var(--color-text-primary)] ${sidebarOpen ? 'w-full gap-3 px-4' : 'h-12 w-12 justify-center'}`}>
-        <Bell size={22} strokeWidth={2} />{unread && <span className="absolute right-3 top-3 h-2 w-2 rounded-full bg-[var(--color-accent)]" />}
+        <Bell size={22} strokeWidth={2} />{unreadCount > 0 && <span className="absolute right-3 top-3 h-2 w-2 rounded-full bg-[var(--color-accent)]" />}
         {sidebarOpen && <span>Notifications</span>}
       </button>
-      {notificationsOpen && <div className={`absolute bottom-16 z-50 w-80 border border-[var(--color-border-subtle)] bg-[var(--color-card-bg)] p-4 shadow-2xl ${sidebarOpen ? 'left-0' : 'left-full ml-3'}`}><div className="flex items-center justify-between gap-3"><div><p className="font-semibold">Notifications</p><p className="mt-0.5 text-xs text-[var(--color-text-muted)]">Your latest workspace updates.</p></div>{unread && <button type="button" onClick={() => setUnread(false)} className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--color-accent)]"><CheckCheck size={15} />Mark read</button>}</div><div className="mt-4 divide-y divide-[var(--color-border-subtle)] border-y border-[var(--color-border-subtle)]"><div className="py-3"><p className="flex items-center gap-2 text-sm font-medium"><CircleDot size={14} className="text-[var(--color-accent)]" />New lead received</p><p className="mt-1 text-xs leading-relaxed text-[var(--color-text-muted)]">Maya Rodriguez sent a Brand Strategy enquiry.</p></div><div className="py-3"><p className="text-sm font-medium">Newsletter is ready</p><p className="mt-1 text-xs leading-relaxed text-[var(--color-text-muted)]">Your footer sign-up section can now collect emails.</p></div><div className="py-3"><p className="text-sm font-medium">Supabase not connected</p><p className="mt-1 text-xs leading-relaxed text-[var(--color-text-muted)]">Connect it when you are ready to make leads and accounts live.</p></div></div></div>}
+      {notificationsOpen && (
+        <div className={`absolute bottom-16 z-50 w-80 border border-[var(--color-border-subtle)] bg-[var(--color-card-bg)] p-4 shadow-2xl ${sidebarOpen ? 'left-0' : 'left-full ml-3'}`}>
+          <div className="flex items-center justify-between gap-3">
+            <div><p className="font-semibold">Notifications</p><p className="mt-0.5 text-xs text-[var(--color-text-muted)]">Your latest workspace updates.</p></div>
+            {unreadCount > 0 && adminUser && (
+              <button type="button" onClick={async () => { await markAllNotificationsRead(adminUser.user.id); setNotifications((n) => n.map((item) => ({ ...item, read: true }))); }} className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--color-accent)]"><CheckCheck size={15} />Mark all read</button>
+            )}
+          </div>
+          <div className="mt-4 divide-y divide-[var(--color-border-subtle)] border-y border-[var(--color-border-subtle)]">
+            {notifications.length === 0 ? (
+              <p className="py-4 text-center text-xs text-[var(--color-text-muted)]">No notifications yet.</p>
+            ) : notifications.map((n) => (
+              <div key={n.id} className="py-3">
+                <p className="flex items-center gap-2 text-sm font-medium">
+                  {!n.read && <CircleDot size={14} className="shrink-0 text-[var(--color-accent)]" />}
+                  {n.title}
+                </p>
+                {n.message && <p className="mt-1 text-xs leading-relaxed text-[var(--color-text-muted)]">{n.message}</p>}
+                {!n.read && (
+                  <button type="button" onClick={async () => { await markNotificationRead(n.id); setNotifications((prev) => prev.map((item) => item.id === n.id ? { ...item, read: true } : item)); }} className="mt-1.5 text-[10px] font-semibold text-[var(--color-accent)] hover:underline">Mark read</button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       <Link to="/admin/profile" title={!sidebarOpen ? 'My profile' : undefined} className={`mt-2 flex min-h-12 items-center rounded-sm text-left text-sm font-medium transition-colors hover:bg-[var(--color-border-subtle)] ${sidebarOpen ? 'w-full gap-3 px-4' : 'h-12 w-12 justify-center'}`}>
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent)] text-xs font-bold text-[var(--color-accent-fg)]">{getProfileInitials(profile.name)}</span>
-        {sidebarOpen && <><span className="min-w-0 flex-1"><span className="block truncate font-semibold">{profile.name}</span><span className="block text-xs text-[var(--color-text-muted)]">{profile.role}</span></span><ChevronDown size={16} className="text-[var(--color-text-muted)]" /></>}
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent)] text-xs font-bold text-[var(--color-accent-fg)]">{adminUser ? getProfileInitials(adminUser.name) : getProfileInitials(profile.name)}</span>
+        {sidebarOpen && <><span className="min-w-0 flex-1"><span className="block truncate font-semibold">{adminUser?.name ?? profile.name}</span><span className="block text-xs text-[var(--color-text-muted)]">{adminUser?.role ?? profile.role}</span></span><ChevronDown size={16} className="text-[var(--color-text-muted)]" /></>}
       </Link>
+      <button type="button" onClick={handleSignOut} title={!sidebarOpen ? 'Sign out' : undefined} className={`mt-1 flex min-h-11 items-center rounded-sm text-sm font-medium text-[var(--color-text-muted)] transition-colors hover:bg-red-500/10 hover:text-red-500 ${sidebarOpen ? 'w-full gap-3 px-4' : 'h-11 w-12 justify-center'}`}>
+        <LogOut size={18} strokeWidth={2} />
+        {sidebarOpen && <span>Sign out</span>}
+      </button>
     </div>
   );
 

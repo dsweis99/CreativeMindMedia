@@ -1,76 +1,170 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Bookmark, Download, Eye, EyeOff, Save, Search, UsersRound } from 'lucide-react';
-import { getNewsletterSettings, getNewsletterSubscribers, NEWSLETTER_UPDATED_EVENT, saveNewsletterSettings, saveNewsletterSubscribers, type NewsletterSettings, type NewsletterSubscriber } from '../../data/newsletter';
+import { Bookmark, BookmarkCheck, Download, Loader2, Save, Search, Trash2 } from 'lucide-react';
+import { getNewsletterSettings, saveNewsletterSettings, type NewsletterSettings } from '../../data/newsletter';
+import { fetchSubscribers, updateSubscriber, deleteSubscriber, type Subscriber } from '../../lib/db';
 
-type SubscriberFilter = 'all' | 'individual' | 'company' | 'saved';
-const csvCell = (value: string) => `"${value.replaceAll('"', '""')}"`;
+type TypeFilter = 'all' | 'individual' | 'company';
 
 export function AdminNewsletter() {
+  const [settings, setSettings] = useState<NewsletterSettings>(() => getNewsletterSettings());
   const [draft, setDraft] = useState<NewsletterSettings>(() => getNewsletterSettings());
-  const [subscribers, setSubscribers] = useState<NewsletterSubscriber[]>(() => getNewsletterSubscribers());
-  const [saved, setSaved] = useState(false);
-  const [filter, setFilter] = useState<SubscriberFilter>('all');
-  const [query, setQuery] = useState('');
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [settingsSaved, setSettingsSaved] = useState(false);
+
+  const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [search, setSearch] = useState('');
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
+  const [savedFilter, setSavedFilter] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    const refresh = () => setSubscribers(getNewsletterSubscribers());
-    window.addEventListener(NEWSLETTER_UPDATED_EVENT, refresh);
-    return () => window.removeEventListener(NEWSLETTER_UPDATED_EVENT, refresh);
+    fetchSubscribers().then(({ data, error: err }) => {
+      if (err) setError(err.message);
+      else setSubscribers((data as Subscriber[]) ?? []);
+      setLoading(false);
+    });
   }, []);
 
-  const filteredSubscribers = useMemo(() => subscribers.filter((subscriber) => {
-    const matchesFilter = filter === 'all' || filter === subscriber.type || (filter === 'saved' && subscriber.saved);
-    return matchesFilter && subscriber.email.toLowerCase().includes(query.toLowerCase());
-  }), [filter, query, subscribers]);
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase();
+    return subscribers.filter((s) => {
+      if (q && !s.email.toLowerCase().includes(q)) return false;
+      if (typeFilter !== 'all' && s.type !== typeFilter) return false;
+      if (savedFilter && !s.saved) return false;
+      return true;
+    });
+  }, [subscribers, search, typeFilter, savedFilter]);
 
-  const update = (field: keyof NewsletterSettings, value: string | boolean) => {
-    setDraft((current) => ({ ...current, [field]: value }));
-    setSaved(false);
+  const stats = useMemo(() => ({
+    total: subscribers.length,
+    companies: subscribers.filter((s) => s.type === 'company').length,
+    individuals: subscribers.filter((s) => s.type === 'individual').length,
+  }), [subscribers]);
+
+  const allSelected = filtered.length > 0 && filtered.every((s) => selected.has(s.id));
+
+  const toggleSelect = (id: string) =>
+    setSelected((prev) => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
+
+  const toggleAll = () =>
+    setSelected(allSelected ? new Set() : new Set(filtered.map((s) => s.id)));
+
+  const patchSubscriber = async (id: string, patch: Partial<Pick<Subscriber, 'type' | 'saved'>>) => {
+    await updateSubscriber(id, patch);
+    setSubscribers((prev) => prev.map((s) => s.id === id ? { ...s, ...patch } : s));
   };
 
-  const updateSubscriber = (id: string, updates: Partial<NewsletterSubscriber>) => {
-    const next = subscribers.map((subscriber) => subscriber.id === id ? { ...subscriber, ...updates } : subscriber);
-    setSubscribers(next);
-    saveNewsletterSubscribers(next);
+  const removeSubscriber = async (id: string) => {
+    await deleteSubscriber(id);
+    setSubscribers((prev) => prev.filter((s) => s.id !== id));
+    setSelected((prev) => { const next = new Set(prev); next.delete(id); return next; });
   };
-
-  const toggleSelected = (id: string) => setSelectedIds((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
-  const toggleAll = () => setSelectedIds((current) => filteredSubscribers.every((subscriber) => current.includes(subscriber.id)) ? current.filter((id) => !filteredSubscribers.some((subscriber) => subscriber.id === id)) : [...new Set([...current, ...filteredSubscribers.map((subscriber) => subscriber.id)])]);
-  const selectedSubscribers = selectedIds.length ? subscribers.filter((subscriber) => selectedIds.includes(subscriber.id)) : filteredSubscribers;
 
   const exportCsv = () => {
-    const rows = [['Email', 'Type', 'Saved', 'Subscribed at'], ...selectedSubscribers.map((subscriber) => [subscriber.email, subscriber.type === 'company' ? 'Company' : 'Individual', subscriber.saved ? 'Yes' : 'No', new Date(subscriber.subscribedAt).toLocaleString()])];
-    const blob = new Blob([rows.map((row) => row.map(csvCell).join(',')).join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const rows = (selected.size > 0 ? filtered.filter((s) => selected.has(s.id)) : filtered);
+    const csv = ['Email,Type,Saved,Subscribed At', ...rows.map((s) => `${s.email},${s.type},${s.saved},${s.subscribed_at}`)].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'cmm-newsletter-subscribers.csv';
-    link.click();
+    const a = document.createElement('a'); a.href = url; a.download = 'newsletter-subscribers.csv'; a.click();
     URL.revokeObjectURL(url);
   };
 
+  const saveSettings = () => {
+    saveNewsletterSettings(draft);
+    setSettings(draft);
+    setSettingsSaved(true);
+    setTimeout(() => setSettingsSaved(false), 3000);
+  };
+
   return (
-    <div className="mx-auto max-w-6xl">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-accent)]">Audience growth</p>
+    <div className="mx-auto max-w-7xl">
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-accent)]">Email</p>
       <h1 className="mt-2 font-display text-5xl tracking-wide sm:text-6xl">Newsletter</h1>
-      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--color-text-muted)]">Manage the email sign-up section, group subscribers, and export a list for your outreach.</p>
-      <div className="mt-10 grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
-        <section className="border border-[var(--color-border-subtle)] bg-[var(--color-card-bg)] p-6 sm:p-8">
-          <div className="flex items-start justify-between gap-4"><div><h2 className="font-display text-4xl tracking-wide">Footer sign-up</h2><p className="mt-2 text-sm text-[var(--color-text-muted)]">Show or hide it without removing any footer links.</p></div><button type="button" role="switch" aria-checked={draft.enabled} onClick={() => update('enabled', !draft.enabled)} className={`flex h-9 w-16 shrink-0 items-center rounded-full p-1 transition-colors ${draft.enabled ? 'justify-end bg-[var(--color-accent)]' : 'justify-start bg-[var(--color-border-subtle)]'}`}><span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-bg-primary)]">{draft.enabled ? <Eye size={15} /> : <EyeOff size={15} />}</span></button></div>
-          <div className="mt-8 space-y-5">
-            <div><label htmlFor="newsletterTitle" className="mb-2 block text-sm font-medium">Heading</label><textarea id="newsletterTitle" rows={2} value={draft.title} onChange={(event) => update('title', event.target.value)} className="w-full resize-none border border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] px-4 py-3 text-sm outline-none focus:border-[var(--color-accent)]" /></div>
-            <div><label htmlFor="newsletterPlaceholder" className="mb-2 block text-sm font-medium">Email field placeholder</label><input id="newsletterPlaceholder" value={draft.placeholder} onChange={(event) => update('placeholder', event.target.value)} className="w-full border border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] px-4 py-3 text-sm outline-none focus:border-[var(--color-accent)]" /></div>
-            <div><label htmlFor="newsletterButton" className="mb-2 block text-sm font-medium">Button label</label><input id="newsletterButton" value={draft.buttonLabel} onChange={(event) => update('buttonLabel', event.target.value)} className="w-full border border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] px-4 py-3 text-sm outline-none focus:border-[var(--color-accent)]" /></div>
-            <button type="button" onClick={() => { saveNewsletterSettings(draft); setSaved(true); }} className="inline-flex items-center gap-2 bg-[var(--color-accent)] px-5 py-3 text-sm font-semibold text-[var(--color-accent-fg)]"><Save size={17} />Save newsletter</button>
-            {saved && <p className="text-sm text-emerald-500">Saved. The Footer updates immediately in this browser.</p>}
+      <p className="mt-3 text-sm text-[var(--color-text-muted)]">Manage the footer sign-up widget and your subscriber list.</p>
+
+      {/* Settings */}
+      <section className="mt-10 border border-[var(--color-border-subtle)] bg-[var(--color-card-bg)] p-6 sm:p-8">
+        <h2 className="font-display text-3xl tracking-wide">Sign-up widget settings</h2>
+        <div className="mt-6 grid gap-5 sm:grid-cols-2">
+          <div className="flex items-center justify-between gap-4 border border-[var(--color-border-subtle)] p-4 sm:col-span-2">
+            <div><p className="font-medium">Enable newsletter sign-up</p><p className="mt-0.5 text-xs text-[var(--color-text-muted)]">Show the sign-up form in the website footer.</p></div>
+            <button type="button" role="switch" aria-checked={draft.enabled} onClick={() => setDraft((d) => ({ ...d, enabled: !d.enabled }))} className={`flex h-8 w-14 items-center rounded-full p-1 transition-colors ${draft.enabled ? 'bg-[var(--color-accent)]' : 'bg-[var(--color-border-subtle)]'}`}>
+              <span className={`h-6 w-6 rounded-full bg-white shadow transition-transform ${draft.enabled ? 'translate-x-6' : 'translate-x-0'}`} />
+            </button>
           </div>
-        </section>
-        <aside className="border border-[var(--color-border-subtle)] bg-[var(--color-card-bg)] p-6 sm:p-8"><div className="flex h-11 w-11 items-center justify-center rounded-full bg-[var(--color-accent-dim)] text-[var(--color-accent)]"><UsersRound size={20} /></div><p className="mt-6 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">Subscribers</p><p className="mt-1 font-display text-6xl tracking-wide">{subscribers.length}</p><div className="mt-5 grid grid-cols-2 gap-3 border-t border-[var(--color-border-subtle)] pt-5 text-sm"><p><span className="block text-xl font-semibold">{subscribers.filter((subscriber) => subscriber.type === 'company').length}</span><span className="text-[var(--color-text-muted)]">Companies</span></p><p><span className="block text-xl font-semibold">{subscribers.filter((subscriber) => subscriber.type === 'individual').length}</span><span className="text-[var(--color-text-muted)]">Individuals</span></p></div><p className="mt-6 text-xs leading-relaxed text-[var(--color-text-muted)]">Company/individual is initially estimated from the email domain. You can change it manually in the list.</p></aside>
+          <div><label className="mb-2 block text-sm font-medium">Heading</label><input value={draft.title} onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))} className="w-full border border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] px-4 py-3 text-sm outline-none focus:border-[var(--color-accent)]" /></div>
+          <div><label className="mb-2 block text-sm font-medium">Placeholder text</label><input value={draft.placeholder} onChange={(e) => setDraft((d) => ({ ...d, placeholder: e.target.value }))} className="w-full border border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] px-4 py-3 text-sm outline-none focus:border-[var(--color-accent)]" /></div>
+          <div><label className="mb-2 block text-sm font-medium">Button label</label><input value={draft.buttonLabel} onChange={(e) => setDraft((d) => ({ ...d, buttonLabel: e.target.value }))} className="w-full border border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] px-4 py-3 text-sm outline-none focus:border-[var(--color-accent)]" /></div>
+        </div>
+        <div className="mt-6 flex items-center gap-4">
+          <button onClick={saveSettings} className="inline-flex items-center gap-2 bg-[var(--color-accent)] px-5 py-3 text-sm font-semibold text-[var(--color-accent-fg)]"><Save size={17} />Save settings</button>
+          {settingsSaved && <p className="text-sm text-emerald-500">Settings saved.</p>}
+        </div>
+      </section>
+
+      {/* Stats */}
+      <div className="mt-6 grid grid-cols-3 gap-4">
+        {[{ label: 'Total subscribers', value: stats.total }, { label: 'Companies', value: stats.companies }, { label: 'Individuals', value: stats.individuals }].map(({ label, value }) => (
+          <div key={label} className="border border-[var(--color-border-subtle)] bg-[var(--color-card-bg)] p-5">
+            <p className="font-display text-4xl tracking-wide">{value}</p>
+            <p className="mt-1 text-sm text-[var(--color-text-muted)]">{label}</p>
+          </div>
+        ))}
       </div>
-      <section className="mt-5 border border-[var(--color-border-subtle)] bg-[var(--color-card-bg)]">
-        <div className="border-b border-[var(--color-border-subtle)] p-6"><div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start"><div><h2 className="font-display text-4xl tracking-wide">Subscriber list</h2><p className="mt-1 text-sm text-[var(--color-text-muted)]">Filter, save, select, or export your list.</p></div><button type="button" onClick={exportCsv} disabled={!selectedSubscribers.length} className="inline-flex items-center justify-center gap-2 border border-[var(--color-border-subtle)] px-4 py-3 text-sm font-semibold transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-40"><Download size={17} />Export {selectedIds.length ? `${selectedIds.length} selected` : 'filtered'} CSV</button></div><div className="mt-6 flex flex-col gap-3 lg:flex-row"><label className="flex min-w-0 flex-1 items-center gap-2 border border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] px-3"><Search size={17} className="text-[var(--color-text-muted)]" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search an email" className="min-w-0 flex-1 bg-transparent py-3 text-sm outline-none" /></label><div className="flex flex-wrap gap-2">{(['all', 'company', 'individual', 'saved'] as SubscriberFilter[]).map((item) => <button type="button" key={item} onClick={() => setFilter(item)} className={`px-3 py-2 text-xs font-semibold capitalize transition-colors ${filter === item ? 'bg-[var(--color-accent)] text-[var(--color-accent-fg)]' : 'border border-[var(--color-border-subtle)] text-[var(--color-text-muted)] hover:border-[var(--color-accent)]'}`}>{item === 'all' ? 'All' : item === 'company' ? 'Companies' : item === 'individual' ? 'Individuals' : 'Saved'}</button>)}</div></div></div>
-        {filteredSubscribers.length ? <div className="overflow-x-auto"><table className="w-full min-w-[760px] text-left text-sm"><thead className="border-b border-[var(--color-border-subtle)] text-xs uppercase tracking-[0.12em] text-[var(--color-text-muted)]"><tr><th className="w-12 px-5 py-4"><input type="checkbox" aria-label="Select all filtered subscribers" checked={filteredSubscribers.every((subscriber) => selectedIds.includes(subscriber.id))} onChange={toggleAll} /></th><th className="px-3 py-4">Email</th><th className="px-3 py-4">Type</th><th className="px-3 py-4">Saved</th><th className="px-3 py-4">Received</th></tr></thead><tbody className="divide-y divide-[var(--color-border-subtle)]">{filteredSubscribers.map((subscriber) => <tr key={subscriber.id}><td className="px-5 py-4"><input type="checkbox" aria-label={`Select ${subscriber.email}`} checked={selectedIds.includes(subscriber.id)} onChange={() => toggleSelected(subscriber.id)} /></td><td className="px-3 py-4 font-medium">{subscriber.email}</td><td className="px-3 py-4"><select value={subscriber.type} onChange={(event) => updateSubscriber(subscriber.id, { type: event.target.value as NewsletterSubscriber['type'] })} className="border border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] px-2 py-1.5 text-xs outline-none focus:border-[var(--color-accent)]"><option value="company">Company</option><option value="individual">Individual</option></select></td><td className="px-3 py-4"><button type="button" onClick={() => updateSubscriber(subscriber.id, { saved: !subscriber.saved })} className={`inline-flex items-center gap-1.5 text-xs font-semibold ${subscriber.saved ? 'text-[var(--color-accent)]' : 'text-[var(--color-text-muted)] hover:text-[var(--color-accent)]'}`}><Bookmark size={16} fill={subscriber.saved ? 'currentColor' : 'none'} />{subscriber.saved ? 'Saved' : 'Save'}</button></td><td className="px-3 py-4 text-xs text-[var(--color-text-muted)]">{new Date(subscriber.subscribedAt).toLocaleString()}</td></tr>)}</tbody></table></div> : <p className="p-6 text-sm text-[var(--color-text-muted)]">No subscribers match this filter.</p>}
+
+      {/* Subscriber list */}
+      <section className="mt-6 border border-[var(--color-border-subtle)] bg-[var(--color-card-bg)]">
+        <div className="flex flex-col gap-3 border-b border-[var(--color-border-subtle)] p-4 sm:flex-row sm:items-center">
+          <label className="flex flex-1 items-center gap-3 border border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] px-4 py-2.5">
+            <Search size={16} className="text-[var(--color-text-muted)]" />
+            <input className="w-full bg-transparent text-sm outline-none placeholder:text-[var(--color-text-muted)]" placeholder="Search email" value={search} onChange={(e) => setSearch(e.target.value)} />
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {(['all', 'company', 'individual'] as TypeFilter[]).map((f) => (
+              <button key={f} onClick={() => setTypeFilter(f)} className={`border px-3 py-2 text-xs font-semibold capitalize transition-colors ${typeFilter === f ? 'border-[var(--color-accent)] bg-[var(--color-accent-dim)] text-[var(--color-accent)]' : 'border-[var(--color-border-subtle)] text-[var(--color-text-muted)] hover:border-[var(--color-accent)]'}`}>{f}</button>
+            ))}
+            <button onClick={() => setSavedFilter((v) => !v)} className={`inline-flex items-center gap-1.5 border px-3 py-2 text-xs font-semibold transition-colors ${savedFilter ? 'border-[var(--color-accent)] bg-[var(--color-accent-dim)] text-[var(--color-accent)]' : 'border-[var(--color-border-subtle)] text-[var(--color-text-muted)] hover:border-[var(--color-accent)]'}`}>
+              <BookmarkCheck size={14} />Saved
+            </button>
+            <button onClick={exportCsv} className="inline-flex items-center gap-1.5 border border-[var(--color-border-subtle)] px-3 py-2 text-xs font-semibold text-[var(--color-text-muted)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]">
+              <Download size={14} />CSV {selected.size > 0 ? `(${selected.size})` : ''}
+            </button>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="flex items-center justify-center py-16"><Loader2 size={24} className="animate-spin text-[var(--color-accent)]" /></div>
+        ) : error ? (
+          <p className="px-6 py-10 text-center text-sm text-red-500">{error}</p>
+        ) : (
+          <>
+            <div className="hidden grid-cols-[2rem_1.8fr_0.9fr_0.6fr_0.6fr_2rem] items-center gap-4 border-b border-[var(--color-border-subtle)] px-5 py-3 text-xs font-semibold uppercase tracking-wide text-[var(--color-text-muted)] sm:grid">
+              <input type="checkbox" checked={allSelected} onChange={toggleAll} className="h-4 w-4 accent-[var(--color-accent)]" />
+              <span>Email</span><span>Type</span><span>Saved</span><span>Subscribed</span><span></span>
+            </div>
+            {filtered.length === 0 ? (
+              <p className="px-6 py-12 text-center text-sm text-[var(--color-text-muted)]">No subscribers match your filters.</p>
+            ) : (
+              filtered.map((sub) => (
+                <div key={sub.id} className="grid grid-cols-[2rem_1fr] items-center gap-3 border-b border-[var(--color-border-subtle)] px-5 py-4 last:border-0 sm:grid-cols-[2rem_1.8fr_0.9fr_0.6fr_0.6fr_2rem]">
+                  <input type="checkbox" checked={selected.has(sub.id)} onChange={() => toggleSelect(sub.id)} className="h-4 w-4 accent-[var(--color-accent)]" />
+                  <p className="truncate text-sm font-medium">{sub.email}</p>
+                  <select value={sub.type} onChange={(e) => patchSubscriber(sub.id, { type: e.target.value as 'individual' | 'company' })} className="border border-[var(--color-border-subtle)] bg-[var(--color-bg-primary)] px-2 py-1 text-xs outline-none focus:border-[var(--color-accent)]">
+                    <option value="individual">Individual</option>
+                    <option value="company">Company</option>
+                  </select>
+                  <button onClick={() => patchSubscriber(sub.id, { saved: !sub.saved })} className={`flex h-7 w-7 items-center justify-center rounded-sm transition-colors ${sub.saved ? 'text-[var(--color-accent)]' : 'text-[var(--color-text-muted)] hover:text-[var(--color-accent)]'}`}>
+                    {sub.saved ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
+                  </button>
+                  <p className="text-xs text-[var(--color-text-muted)]">{new Date(sub.subscribed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
+                  <button onClick={() => removeSubscriber(sub.id)} className="flex h-7 w-7 items-center justify-center text-[var(--color-text-muted)] hover:text-red-500 transition-colors"><Trash2 size={15} /></button>
+                </div>
+              ))
+            )}
+          </>
+        )}
       </section>
     </div>
   );

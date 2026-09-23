@@ -1,13 +1,41 @@
 import { useEffect, useState } from 'react';
-import { Eye, EyeOff, Plus, Save, Trash2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Plus, Save, Trash2 } from 'lucide-react';
 import { featuredOfferPresets, type CampaignExample, type CampaignExampleType, type FeaturedOffer } from '../../data/featuredOffer';
 import { useFeaturedOffer } from '../../hooks/useFeaturedOffer';
+import { fetchCampaigns, upsertCampaign } from '../../lib/db';
 
 export function AdminCampaigns() {
   const { offer, saveOffer } = useFeaturedOffer();
   const [draft, setDraft] = useState<FeaturedOffer>(offer);
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [dbId, setDbId] = useState<string | undefined>(undefined);
+
   useEffect(() => setDraft(offer), [offer]);
+
+  // Load the most-recent campaign from Supabase on mount
+  useEffect(() => {
+    fetchCampaigns().then(({ data }) => {
+      if (data && data.length > 0) {
+        const row = data[0] as { id: string; campaign_type: string; eyebrow: string; headline: string; description: string; button_label: string; form_prompt: string; examples: CampaignExample[]; active: boolean };
+        setDbId(row.id);
+        const loaded: FeaturedOffer = {
+          ...offer,
+          campaignType: row.campaign_type ?? offer.campaignType,
+          eyebrow: row.eyebrow ?? offer.eyebrow,
+          title: row.headline ?? offer.title,
+          description: row.description ?? offer.description,
+          buttonLabel: row.button_label ?? offer.buttonLabel,
+          formPrompt: row.form_prompt ?? offer.formPrompt,
+          examples: row.examples ?? offer.examples,
+          enabled: row.active ?? offer.enabled,
+        };
+        setDraft(loaded);
+        saveOffer(loaded);
+      }
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const update = (field: keyof FeaturedOffer, value: string | boolean) => { setDraft((current) => ({ ...current, [field]: value })); setSaved(false); };
   const addExample = () => {
     const newExample: CampaignExample = { id: crypto.randomUUID(), type: 'video', title: 'New video example', description: '', mediaUrl: '', actionUrl: '' };
@@ -42,7 +70,26 @@ export function AdminCampaigns() {
                 <button type="button" onClick={addExample} className="inline-flex items-center gap-2 border border-[var(--color-border-subtle)] px-4 py-3 text-sm font-semibold hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"><Plus size={17} />Add example</button>
               </div>
             </div>
-            <button type="button" onClick={() => { saveOffer(draft); setSaved(true); }} className="inline-flex items-center gap-2 bg-[var(--color-accent)] px-5 py-3 text-sm font-semibold text-[var(--color-accent-fg)]"><Save size={17} />Save campaign</button>{saved && <p className="mt-3 text-sm text-emerald-500">Saved. Refresh the Home page to see the current campaign.</p>}
+            <button type="button" disabled={saving} onClick={async () => {
+              setSaving(true);
+              saveOffer(draft);
+              await upsertCampaign({
+                ...(dbId ? { id: dbId } : {}),
+                campaign_type: draft.campaignType,
+                eyebrow: draft.eyebrow,
+                headline: draft.title,
+                description: draft.description,
+                button_label: draft.buttonLabel,
+                form_prompt: draft.formPrompt,
+                examples: draft.examples,
+                active: draft.enabled,
+              });
+              setSaving(false);
+              setSaved(true);
+            }} className="inline-flex items-center gap-2 bg-[var(--color-accent)] px-5 py-3 text-sm font-semibold text-[var(--color-accent-fg)] disabled:opacity-60">
+              {saving ? <Loader2 size={17} className="animate-spin" /> : <Save size={17} />}
+              Save campaign
+            </button>{saved && <p className="mt-3 text-sm text-emerald-500">Saved to Supabase. Refresh the Home page to see changes.</p>}
           </div>
         </section>
         <aside className="border border-[var(--color-border-subtle)] bg-[var(--color-card-bg)] p-6"><h2 className="font-display text-3xl tracking-wide">Quick templates</h2><p className="mt-2 text-sm leading-relaxed text-[var(--color-text-muted)]">Start from one of these, then adjust the wording as you need.</p><div className="mt-6 space-y-3">{featuredOfferPresets.map((preset) => <button type="button" key={preset.campaignType} onClick={() => { setDraft(preset); setSaved(false); }} className={`w-full border p-4 text-left transition-colors ${draft.campaignType === preset.campaignType ? 'border-[var(--color-accent)] bg-[var(--color-accent-dim)]' : 'border-[var(--color-border-subtle)] hover:border-[var(--color-accent)]'}`}><p className="font-semibold">{preset.campaignType}</p><p className="mt-1 text-xs leading-relaxed text-[var(--color-text-muted)]">{preset.buttonLabel}</p></button>)}</div></aside>
